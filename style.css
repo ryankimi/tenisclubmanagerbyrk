@@ -1,0 +1,96 @@
+body {
+    font-family: sans-serif;
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 50px;
+    background-color: #f8f9fa;
+}
+.page { width: 95%; max-width: 800px; margin: auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.hidden { display: none; }
+input { display: block; margin: 10px auto; padding: 8px; font-size: 16px; width: 80%; max-width: 400px; }
+button { padding: 10px 15px; font-size: 16px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc; margin: 5px; }
+
+/* GAYA BARU DITAMBAHKAN DI SINI */
+.subtitle {
+    margin-top: -10px;
+    margin-bottom: 30px;
+    font-style: italic;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.tombol-kembali { position: absolute; top: 15px; left: 15px; background-color: #6c757d; color: white; border: none; margin: 0; }
+#halaman-utama, #halaman-daftar-hari, #halaman-klasemen-umum, #halaman-daftar-klub, #halaman-autentikasi { position: relative; padding-top: 60px; }
+
+/* CLUB LIST PAGE STYLES */
+#container-daftar-klub { margin: 20px 0; }
+.klub-item-container { display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; }
+.nama-klub-item { font-size: 20px; font-weight: bold; text-align: left; }
+.klub-item-actions button { font-size: 14px; padding: 5px 10px; }
+.tombol-buka-klub { background-color: #28a745; color: white; border: none; }
+
+
+/* DAY LIST PAGE STYLES */
+#container-daftar-hari { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin: 20px 0; padding: 10px; border: 1px solid #eee; min-height: 100px; }
+.hari-item-container { position: relative; display: flex; align-items: center; border: 1px solid #ccc; border-radius: 8px; min-width: 250px; }
+.tombol-hari { padding: 20px; font-size: 18px; font-weight: bold; background-color: #e9ecef; flex-grow: 1; border: none; }
+.tombol-hapus-hari, .tombol-rename-hari { background-color: transparent; border: none; font-size: 20px; padding: 0 10px; }
+.tombol-hapus-hari { color: #dc3545; }
+.tombol-rename-hari { color: #ffc107; }
+
+/* GENERAL BUTTONS */
+.tombol-utama { background-color: #007bff; color: white; font-weight: bold; border: none; margin-top: 20px; }
+#tombol-lihat-klasemen { background-color: #17a2b8; }
+#tombol-tambah-match { background-color: #28a745; color: white; border: none; }
+.tombol-bahaya { background-color: #dc3545; color: white; border: none; padding: 8px 12px; font-size: 14px; }
+#tombol-reset-total { position: absolute; top: 15px; right: 15px; margin: 0; }
+
+/* PLAYER & MATCH STYLES */
+.kotak-daftar-pemain { border: 1px dashed grey; width: 80%; min-height: 100px; margin: 20px auto; padding: 10px; }
+.item-pemain { background-color: #f0f0f0; padding: 8px 12px; margin: 5px; border-radius: 15px; display: inline-block; cursor: grab; transition: background-color 0.2s; }
+.item-pemain:hover { background-color: #ffdddd; text-decoration: line-through; cursor: pointer; }
+.pertandingan-section, .pemain-section { margin-top: 25px; }
+.kotak-pertandingan { position: relative; border: 2px solid black; padding: 15px; padding-top: 40px; margin: 20px auto; width: 95%; max-width: 600px; transition: all 0.3s ease; }
+.match-layout-container { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.vs-separator { font-weight: bold; font-size: 24px; color: #555; }
+.tim { flex: 1; }
+.tim-kiri .slot-pemain { background-color: #e0e7ff; }
+.tim-kanan .slot-pemain { background-color: #ffe0e0; }
+.tim-slot { display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+.slot-pemain { border: 1px dashed grey; height: 40px; margin: 5px auto; width: 100%; max-width: 180px; display: flex; justify-content: center; align-items: center; }
+.slot-pemain .item-pemain { cursor: pointer; }
+.slot-pemain .item-pemain:hover { background-color: #ffdddd; text-decoration: line-through; }
+.kolom-skor { margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+.input-skor { width: 100px; text-align: center; display: inline-block; margin: 0; }
+.tombol-selesai-match { background-color: #ffc107; color: black; border: none; margin-top: 15px; }
+.pemisah-match { margin-top: 40px; margin-bottom: 20px; }
+#wadah-pertandingan-selesai .kotak-pertandingan { opacity: 0.6; border-style: dashed; }
+.tombol-edit-match, .tombol-save-match { position: absolute; top: 10px; right: 10px; padding: 5px 10px; font-size: 12px; }
+.tombol-edit-match { background-color: #17a2b8; color: white; border: none; }
+.tombol-save-match { background-color: #28a745; color: white; border: none; }
+.tombol-hapus-match { position: absolute; top: 10px; left: 10px; background-color: #dc3545; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; font-size: 14px; font-weight: bold; line-height: 24px; padding: 0; }
+#container-klasemen-umum table { margin: 20px auto; width: 90%; max-width: 600px; border-collapse: collapse; }
+#container-klasemen-umum th, #container-klasemen-umum td { border: 1px solid #ddd; padding: 8px; }
+#container-klasemen-umum th { background-color: #f2f2f2; font-weight: bold; }
+
+/* Autentikasi Styles */
+#halaman-autentikasi h1 {
+    font-size: 32px;
+    margin-bottom: 50px;
+}
+#konten-autentikasi {
+    width: 90%;
+    max-width: 400px;
+    margin: auto;
+}
+#konten-autentikasi input {
+    margin: 10px auto;
+}
+#konten-autentikasi p {
+    margin-top: 15px;
+    font-size: 14px;
+}
+#konten-autentikasi a {
+    color: #007bff;
+    text-decoration: underline;
+}
