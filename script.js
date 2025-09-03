@@ -11,29 +11,17 @@ const JSONBIN_API_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 let tennisAppClubs = [];
 let activeClubId = null;
 let activeDayId = null;
-let activeUser = null; 
 
 // Pages
 const semuaHalaman = document.querySelectorAll('.page');
-const halamanAutentikasi = document.getElementById('halaman-autentikasi');
 const halamanDaftarKlub = document.getElementById('halaman-daftar-klub');
 const halamanDaftarHari = document.getElementById('halaman-daftar-hari');
 const halamanUtama = document.getElementById('halaman-utama');
 const halamanKlasemenUmum = document.getElementById('halaman-klasemen-umum');
 
-// Auth Elements
-const formLogin = document.getElementById('form-login');
-const formRegister = document.getElementById('form-register');
-const tombolLogin = document.getElementById('tombol-login');
-const tombolRegister = document.getElementById('tombol-register');
-const linkKeRegister = document.getElementById('link-ke-register');
-const linkKeLogin = document.getElementById('link-ke-login');
-const tombolLogout = document.getElementById('tombol-logout');
-
 // Club List Page Elements
 const containerDaftarKlub = document.getElementById('container-daftar-klub');
 const tombolTambahKlubBaru = document.getElementById('tombol-tambah-klub-baru');
-const tombolResetTotal = document.getElementById('tombol-reset-total');
 
 // Day List Page Elements
 const kembaliKeDaftarKlub = document.getElementById('kembali-ke-daftar-klub');
@@ -43,7 +31,6 @@ const tombolTambahHariBaru = document.getElementById('tombol-tambah-hari-baru');
 const tombolLihatKlasemen = document.getElementById('tombol-lihat-klasemen');
 
 // Main Setup Page Elements
-// PERBAIKAN: Baris duplikat dihapus dari sini.
 const kembaliKeDaftarHari = document.getElementById('kembali-ke-daftar-hari'); 
 const displayNamaKlubDiUtama = document.getElementById('display-nama-klub-di-utama');
 const judulHariAktif = document.getElementById('judul-hari-aktif');
@@ -65,66 +52,11 @@ const containerKlasemenUmum = document.getElementById('container-klasemen-umum')
 const tombolShareKlasemen = document.getElementById('tombol-share-klasemen');
 
 // =====================================================================
-// AUTHENTICATION & API FUNCTIONS
+// API FUNCTIONS
 // =====================================================================
-linkKeRegister.addEventListener('click', (e) => { e.preventDefault(); formLogin.classList.add('hidden'); formRegister.classList.remove('hidden'); });
-linkKeLogin.addEventListener('click', (e) => { e.preventDefault(); formRegister.classList.add('hidden'); formLogin.classList.remove('hidden'); });
-
-tombolRegister.addEventListener('click', async () => {
-    const username = document.getElementById('register-username').value.trim();
-    const password = document.getElementById('register-password').value.trim();
-    if (!username || !password) return alert("Username and password cannot be empty.");
-
-    try {
-        const data = await loadFromJSONBin();
-        if (data.users && data.users[username]) {
-            return alert("Username already exists. Please choose another one.");
-        }
-        if (!data.users) data.users = {};
-        data.users[username] = { password: password, clubsData: [] };
-        await saveToJSONBin(data);
-        alert("Registration successful! You can now log in.");
-        formRegister.classList.add('hidden');
-        formLogin.classList.remove('hidden');
-    } catch (error) {
-        alert("Registration failed. Could not connect to the database.");
-        console.error("Error during registration:", error);
-    }
-});
-
-tombolLogin.addEventListener('click', async () => {
-    const username = document.getElementById('login-username').value.trim();
-    const password = document.getElementById('login-password').value.trim();
-    if (!username || !password) return alert("Username and password cannot be empty.");
-
-    try {
-        const data = await loadFromJSONBin();
-        const userData = data.users ? data.users[username] : undefined;
-
-        if (userData && userData.password === password) {
-            activeUser = username;
-            tennisAppClubs = userData.clubsData || [];
-            renderDaftarKlub();
-            tampilkanHalaman('halaman-daftar-klub');
-        } else {
-            alert("Invalid username or password.");
-        }
-    } catch (error) {
-        alert("Login failed. Could not connect to the database.");
-        console.error("Error during login:", error);
-    }
-});
-
-tombolLogout.addEventListener('click', () => {
-    activeUser = null;
-    tennisAppClubs = [];
-    activeClubId = null;
-    activeDayId = null;
-    tampilkanHalaman('halaman-autentikasi');
-});
-
 async function saveToJSONBin(data) {
     const headers = { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY };
+    // Selalu gunakan versi terbaru dari data untuk menghindari konflik
     const response = await fetch(JSONBIN_API_URL, { method: 'PUT', headers: headers, body: JSON.stringify(data) });
     if (!response.ok) throw new Error(`Failed to save data: ${response.status}`);
 }
@@ -134,9 +66,9 @@ async function loadFromJSONBin() {
     const response = await fetch(`${JSONBIN_API_URL}/latest`, { headers: headers, cache: 'no-store' });
     if (!response.ok) {
         if (response.status === 404) {
-            console.log("Bin not found, creating a new one.");
-            await saveToJSONBin({ users: {} });
-            return { users: {} };
+            console.log("Bin not found, creating a new one with 'clubs' structure.");
+            await saveToJSONBin({ clubs: [] });
+            return { clubs: [] };
         }
         throw new Error(`Failed to load data: ${response.status}`);
     }
@@ -153,8 +85,6 @@ function tampilkanHalaman(idHalaman) {
 }
 
 async function saveState() {
-    if (!activeUser) return;
-    
     if (activeClubId !== null && activeDayId !== null) {
         const club = getActiveClub();
         const day = getActiveDay();
@@ -168,10 +98,7 @@ async function saveState() {
         }
     }
     try {
-        const allData = await loadFromJSONBin();
-        if (!allData.users) allData.users = {};
-        allData.users[activeUser].clubsData = tennisAppClubs;
-        await saveToJSONBin(allData);
+        await saveToJSONBin({ clubs: tennisAppClubs });
     } catch (error) {
         console.error("Error saving state:", error);
     }
@@ -179,8 +106,10 @@ async function saveState() {
 
 async function initializeApp() {
     try {
-        await loadFromJSONBin(); // Cukup panggil untuk memastikan bin ada
-        tampilkanHalaman('halaman-autentikasi');
+        const data = await loadFromJSONBin();
+        tennisAppClubs = data.clubs || [];
+        renderDaftarKlub();
+        tampilkanHalaman('halaman-daftar-klub');
     } catch (error) {
         console.error("Error initializing app:", error);
         alert("Could not initialize the application. Please check your API keys and Bin ID in script.js.");
@@ -190,6 +119,12 @@ async function initializeApp() {
 // =====================================================================
 // DRAG-AND-DROP LOGIC & HELPERS
 // =====================================================================
+// ... (Fungsi-fungsi di bagian ini tetap sama, tidak perlu diubah)
+// Fungsi seperti allowDrop, drop, getActiveClub, getActiveDay, createPlayerElement, dll.
+// ... (Sisa fungsi-fungsi ini akan saya sertakan di bawah)
+// =====================================================================
+
+// (Lanjutan dari Drag-and-Drop)
 daftarPemain.addEventListener('dragstart', (event) => {
     if (event.target.classList.contains('item-pemain')) {
         event.dataTransfer.setData('text/plain', event.target.textContent);
@@ -245,60 +180,125 @@ function pasangUlangEventListeners() {
         if (tombolSave) tombolSave.onclick = () => saveMatch(matchId);
     });
 }
+
+// =====================================================================
+// CLUB & DAY MANAGEMENT (DIUBAH)
+// =====================================================================
+
 tombolTambahKlubBaru.addEventListener('click', async () => {
     const namaKlub = prompt("Enter new club name:");
-    if (namaKlub && namaKlub.trim() !== '') {
-        tennisAppClubs.push({ clubId: Date.now(), clubName: namaKlub.trim(), days: [] });
-        renderDaftarKlub();
-        await saveState();
-    }
+    if (!namaKlub || namaKlub.trim() === '') return;
+
+    const passwordKlub = prompt(`Enter a password for the club "${namaKlub.trim()}":`);
+    if (!passwordKlub) return; // User cancelled or entered empty password
+
+    tennisAppClubs.push({
+        clubId: Date.now(),
+        clubName: namaKlub.trim(),
+        clubPassword: passwordKlub, // Password disimpan di sini
+        days: []
+    });
+    renderDaftarKlub();
+    await saveState();
 });
-tombolResetTotal.addEventListener('click', async () => {
-    if (confirm('Are you sure you want to delete ALL users and data? This action cannot be undone.')) {
-        await saveToJSONBin({ users: {} });
-        location.reload();
-    }
-});
+
 function renderDaftarKlub() {
     containerDaftarKlub.innerHTML = '';
     if (tennisAppClubs && tennisAppClubs.length > 0) {
         tennisAppClubs.forEach(club => {
-            const itemHTML = `<div class="klub-item-container"><span class="nama-klub-item">${club.clubName}</span><div class="klub-item-actions"><button onclick="renameKlub(${club.clubId})">&#9998;</button><button class="tombol-buka-klub" onclick="muatKlub(${club.clubId})">Open</button><button class="tombol-hapus-hari" onclick="hapusKlub(${club.clubId})">&times;</button></div></div>`;
+            const itemHTML = `<div class="klub-item-container"><span class="nama-klub-item">${club.clubName}</span><div class="klub-item-actions"><button class="tombol-ubah-password" onclick="ubahPasswordKlub(${club.clubId})">🔑</button><button onclick="renameKlub(${club.clubId})">&#9998;</button><button class="tombol-buka-klub" onclick="muatKlub(${club.clubId})">Open</button><button class="tombol-hapus-hari" onclick="hapusKlub(${club.clubId})">&times;</button></div></div>`;
             containerDaftarKlub.insertAdjacentHTML('beforeend', itemHTML);
         });
     } else {
         containerDaftarKlub.innerHTML = '<p>No clubs found. Create a new club to begin.</p>';
     }
 }
+
 function hapusKlub(clubId) {
-    if (confirm('Are you sure you want to delete this club and all its data?')) {
-        tennisAppClubs = tennisAppClubs.filter(club => club.clubId !== clubId);
-        renderDaftarKlub();
-        saveState();
+    const club = tennisAppClubs.find(c => c.clubId === clubId);
+    if (!club) return;
+    
+    const password = prompt(`To delete "${club.clubName}", please enter its password:`);
+    if (password === club.clubPassword) {
+        if (confirm('Are you sure you want to permanently delete this club?')) {
+            tennisAppClubs = tennisAppClubs.filter(c => c.clubId !== clubId);
+            renderDaftarKlub();
+            saveState();
+        }
+    } else if (password !== null) { // Jika tidak cancel
+        alert('Incorrect password!');
     }
 }
+
 function renameKlub(clubId) {
     const club = tennisAppClubs.find(c => c.clubId === clubId);
     if (!club) return;
-    const namaBaru = prompt("Enter the new club name:", club.clubName);
-    if (namaBaru && namaBaru.trim() !== '') {
-        club.clubName = namaBaru.trim();
-        renderDaftarKlub();
-        saveState();
+
+    const password = prompt(`To rename "${club.clubName}", please enter its password:`);
+    if (password === club.clubPassword) {
+        const namaBaru = prompt("Enter the new club name:", club.clubName);
+        if (namaBaru && namaBaru.trim() !== '') {
+            club.clubName = namaBaru.trim();
+            renderDaftarKlub();
+            saveState();
+        }
+    } else if (password !== null) {
+        alert('Incorrect password!');
     }
 }
-function muatKlub(clubId) {
-    activeClubId = clubId;
-    const club = getActiveClub();
+
+function ubahPasswordKlub(clubId) {
+    const club = tennisAppClubs.find(c => c.clubId === clubId);
     if (!club) return;
-    displayNamaKlubDiDaftarHari.textContent = club.clubName;
-    renderDaftarHari();
-    tampilkanHalaman('halaman-daftar-hari');
+
+    // 1. Minta password lama untuk verifikasi
+    const oldPassword = prompt(`To change the password for "${club.clubName}", please enter the old password:`);
+    if (oldPassword === null) return; // User cancelled
+
+    // 2. Periksa apakah password lama benar
+    if (oldPassword !== club.clubPassword) {
+        return alert('Incorrect old password!');
+    }
+
+    // 3. Jika benar, minta password baru
+    const newPassword = prompt("Enter the new password:");
+    if (!newPassword) { // User cancelled or entered empty string
+        return alert("New password cannot be empty.");
+    }
+
+    // 4. Minta konfirmasi password baru
+    const confirmPassword = prompt("Enter the new password again to confirm:");
+    if (newPassword !== confirmPassword) {
+        return alert("The new passwords do not match. Please try again.");
+    }
+
+    // 5. Jika semua cocok, ubah password dan simpan
+    club.clubPassword = newPassword;
+    saveState();
+    alert("Password changed successfully!");
 }
+
+function muatKlub(clubId) {
+    const club = tennisAppClubs.find(c => c.clubId === clubId);
+    if (!club) return;
+
+    const password = prompt(`Enter password to open "${club.clubName}":`);
+    if (password === club.clubPassword) {
+        activeClubId = clubId;
+        displayNamaKlubDiDaftarHari.textContent = club.clubName;
+        renderDaftarHari();
+        tampilkanHalaman('halaman-daftar-hari');
+    } else if (password !== null) {
+        alert('Incorrect password!');
+    }
+}
+
 kembaliKeDaftarKlub.addEventListener('click', () => {
     activeClubId = null;
     tampilkanHalaman('halaman-daftar-klub');
 });
+
+// ... (Sisa fungsi seperti renderDaftarHari, hapusHari, renameHari, dll. tetap sama)
 tombolTambahHariBaru.addEventListener('click', () => {
     const club = getActiveClub();
     if (!club) return;
@@ -308,6 +308,7 @@ tombolTambahHariBaru.addEventListener('click', () => {
     renderDaftarHari();
     saveState();
 });
+
 function renderDaftarHari() {
     const club = getActiveClub();
     containerDaftarHari.innerHTML = '';
@@ -336,6 +337,7 @@ function renderDaftarHari() {
         containerDaftarHari.innerHTML = `<p>No tournament days yet. Click the button below to start.</p>`;
     }
 }
+
 function hapusHari(dayId) {
     const club = getActiveClub();
     if (!club || !confirm('Are you sure you want to delete this day and all its matches?')) return;
@@ -346,6 +348,7 @@ function hapusHari(dayId) {
         saveState();
     }
 }
+
 function renameHari(dayId) {
     const club = getActiveClub();
     if (!club) return;
@@ -358,6 +361,8 @@ function renameHari(dayId) {
         saveState();
     }
 }
+
+// ... (Sisa fungsi match management juga tetap sama)
 function muatHari(dayId) {
     activeDayId = dayId;
     const club = getActiveClub();
@@ -504,38 +509,24 @@ function nomorUlangMatch() {
     day.nextMatchNum = semuaMatchBoxes.length + 1;
 }
 
+
 // =====================================================================
 // STANDINGS PAGE FUNCTIONS & EVENT LISTENERS
 // =====================================================================
-
-// Event listener untuk tombol kembali dari halaman klasemen
-kembaliDariKlasemen.addEventListener('click', () => {
-    tampilkanHalaman('halaman-daftar-hari');
-});
-
-// Event listener BARU untuk tombol lihat klasemen
+// ... (Semua fungsi klasemen tetap sama, tidak perlu diubah)
 tombolLihatKlasemen.addEventListener('click', () => {
     const club = getActiveClub();
     if (!club) return;
-    
     displayNamaKlubDiKlasemen.textContent = club.clubName;
-    
     populateFilterHari(); 
     tampilkanKlasemen(); 
     tampilkanHalaman('halaman-klasemen-umum');
 });
-
 tombolShareKlasemen.addEventListener('click', () => {
     const containerKlasemen = document.getElementById('container-klasemen-umum');
     const originalButtonText = tombolShareKlasemen.textContent;
     const filterDropdown = document.getElementById('filter-hari');
     const selectedOption = filterDropdown.options[filterDropdown.selectedIndex];
-
-    // Simpan gaya asli
-    const originalContainerStyle = containerKlasemen.style.cssText; 
-    const originalTableStyle = containerKlasemen.querySelector('table') ? containerKlasemen.querySelector('table').style.cssText : '';
-    
-    // Siapkan judul
     const titleElement = document.createElement('h3');
     titleElement.textContent = selectedOption.text;
     titleElement.style.textAlign = 'center';
@@ -543,38 +534,28 @@ tombolShareKlasemen.addEventListener('click', () => {
     titleElement.style.color = '#343a40';
     titleElement.style.fontWeight = '600';
     containerKlasemen.prepend(titleElement);
-
     tombolShareKlasemen.textContent = 'Generating...';
     tombolShareKlasemen.disabled = true;
-
-    // --- Penyesuaian sementara untuk pengambilan gambar ---
-    // Atur lebar kontainer dan tabel agar tidak terpotong saat mengambil gambar
-    // Kita paksa lebar tertentu yang cukup untuk tabel penuh
-    containerKlasemen.style.width = 'fit-content'; 
+    const originalContainerStyle = containerKlasemen.style.cssText;
+    const originalTableStyle = containerKlasemen.querySelector('table') ? containerKlasemen.querySelector('table').style.cssText : '';
+    containerKlasemen.style.width = 'fit-content';
     containerKlasemen.style.maxWidth = 'none';
     if (containerKlasemen.querySelector('table')) {
-        containerKlasemen.querySelector('table').style.width = 'auto'; // Agar tabel tidak terpaksa 100% jika kecil
-        containerKlasemen.querySelector('table').style.maxWidth = 'none'; // Hilangkan batasan max-width
+        containerKlasemen.querySelector('table').style.width = 'auto';
+        containerKlasemen.querySelector('table').style.maxWidth = 'none';
     }
-    
-    // Tentukan lebar gambar yang diinginkan (contoh: 700px atau lebih sesuai kebutuhan)
-    const desiredWidth = Math.max(containerKlasemen.offsetWidth, 700); // Ambil lebar aktual atau minimal 700px
-    // --- Akhir penyesuaian sementara ---
-
+    const desiredWidth = Math.max(containerKlasemen.offsetWidth, 700);
     html2canvas(containerKlasemen, {
-        scale: 2, // Tingkatkan skala untuk kualitas gambar yang lebih baik
-        width: desiredWidth, // Paksa lebar output gambar
-        // height: containerKlasemen.offsetHeight // Opsional: paksa tinggi output gambar
+        scale: 2,
+        width: desiredWidth,
     }).then(canvas => {
         const fileNameText = selectedOption.text.replace(/ /g, '_').toLowerCase();
         const fileName = `standings_${fileNameText}.png`;
-
         const link = document.createElement('a');
         link.download = fileName;
         link.href = canvas.toDataURL('image/png');
         link.click();
     }).finally(() => {
-        // Kembalikan semua gaya ke kondisi semula
         containerKlasemen.style.cssText = originalContainerStyle;
         if (containerKlasemen.querySelector('table')) {
             containerKlasemen.querySelector('table').style.cssText = originalTableStyle;
@@ -584,14 +565,11 @@ tombolShareKlasemen.addEventListener('click', () => {
         tombolShareKlasemen.disabled = false;
     });
 });
-
 function populateFilterHari() {
     const club = getActiveClub();
     const filterDropdown = document.getElementById('filter-hari');
     filterDropdown.innerHTML = ''; 
-
     filterDropdown.innerHTML += `<option value="overall">Overall (All Days)</option>`;
-
     if (club && club.days) {
         club.days.forEach(day => {
             filterDropdown.innerHTML += `<option value="${day.id}">${day.name}</option>`;
@@ -599,13 +577,10 @@ function populateFilterHari() {
     }
     filterDropdown.onchange = () => tampilkanKlasemen();
 }
-
 function tampilkanKlasemen() {
     const club = getActiveClub();
     const filterValue = document.getElementById('filter-hari').value;
-    
     let semuaPertandingan = [];
-
     if (filterValue === 'overall') {
         club.days.forEach(day => {
             semuaPertandingan.push(...day.matchResults);
@@ -616,19 +591,14 @@ function tampilkanKlasemen() {
             semuaPertandingan = selectedDay.matchResults;
         }
     }
-
     const statistikPemain = {};
-
     semuaPertandingan.forEach(match => {
         const skor = match.skor.split('-').map(s => parseInt(s.trim()));
         if (skor.length < 2 || isNaN(skor[0]) || isNaN(skor[1])) return;
-
         const pemainTim1 = match.tim1.split('&').map(p => p.trim());
         const pemainTim2 = match.tim2.split('&').map(p => p.trim());
-
         const skorTim1 = skor[0];
         const skorTim2 = skor[1];
-        
         const allPlayers = [...pemainTim1, ...pemainTim2];
         allPlayers.forEach(namaPemain => {
             const key = namaPemain.toLowerCase();
@@ -640,25 +610,21 @@ function tampilkanKlasemen() {
                 };
             }
         });
-
         pemainTim1.forEach(p => {
             const key = p.toLowerCase();
             statistikPemain[key].setDimainkan += skorTim1 + skorTim2;
             statistikPemain[key].setMenang += skorTim1;
         });
-
         pemainTim2.forEach(p => {
             const key = p.toLowerCase();
             statistikPemain[key].setDimainkan += skorTim1 + skorTim2;
             statistikPemain[key].setMenang += skorTim2;
         });
     });
-
     const dataKlasemen = Object.values(statistikPemain).map(stats => {
         const setKalah = stats.setDimainkan - stats.setMenang;
         const winPercentage = stats.setDimainkan > 0 ? (stats.setMenang / stats.setDimainkan) * 100 : 0;
         const poin = stats.setMenang * 10;
-
         return {
             nama: stats.originalName,
             setDimainkan: stats.setDimainkan,
@@ -668,20 +634,15 @@ function tampilkanKlasemen() {
             poin
         };
     });
-
     dataKlasemen.sort((a, b) => b.poin - a.poin || b.winPercentage - a.winPercentage);
     renderTabelKlasemen(dataKlasemen);
 }
-
 function renderTabelKlasemen(data) {
     const container = document.getElementById('container-klasemen-umum');
-    
     if (data.length === 0) {
         container.innerHTML = '<p>No finished matches to display.</p>';
         return;
     }
-
-    // ---- HEADER DIUBAH UNTUK MENAMBAHKAN KATA "SET" ----
     let tableHTML = `
         <table>
             <thead>
@@ -697,7 +658,6 @@ function renderTabelKlasemen(data) {
             </thead>
             <tbody>
     `;
-
     data.forEach((pemain, index) => {
         tableHTML += `
             <tr>
@@ -711,7 +671,6 @@ function renderTabelKlasemen(data) {
             </tr>
         `;
     });
-
     tableHTML += `</tbody></table>`;
     container.innerHTML = tableHTML;
 }
