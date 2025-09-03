@@ -6,6 +6,7 @@
     <title>Tennis Manager</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <div id="halaman-autentikasi" class="page">
@@ -89,7 +90,9 @@
             <label for="filter-hari">View Standings for:</label>
             <select id="filter-hari"></select>
         </div>
-
+        
+        <button id="tombol-share-klasemen" class="tombol-utama">Save as Image</button>
+        
         <div id="container-klasemen-umum"></div>
     </div>
 
