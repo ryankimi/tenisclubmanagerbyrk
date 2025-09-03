@@ -9,35 +9,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-    <div id="halaman-autentikasi" class="page">
-        <h1>Welcome to Tennis Club Manager</h1>
-        <p class="subtitle">by ryankimi</p> 
-        <div id="konten-autentikasi">
-            <div id="form-login">
-                <h3>Login</h3>
-                <input type="text" id="login-username" placeholder="Username">
-                <input type="password" id="login-password" placeholder="Password">
-                <button id="tombol-login" class="tombol-utama">Login</button>
-                <p>Don't have an account? <a href="#" id="link-ke-register">Register here</a></p>
-            </div>
-            <div id="form-register" class="hidden">
-                <h3>Register</h3>
-                <input type="text" id="register-username" placeholder="Username">
-                <input type="password" id="register-password" placeholder="Password">
-                <button id="tombol-register" class="tombol-utama">Register</button>
-                <p>Already have an account? <a href="#" id="link-ke-login">Login here</a></p>
-            </div>
-        </div>
-    </div>
     
-    <div id="halaman-daftar-klub" class="page hidden">
-        <button id="tombol-logout" class="tombol-bahaya">Logout</button>
+    <div id="halaman-daftar-klub" class="page">
         <h1>Tennis Club Manager</h1>
         <p class="subtitle">by ryankimi</p>
-        <h3>CLUB LIST</h3>
+        <h3>PUBLIC CLUB LIST</h3>
         <div id="container-daftar-klub"></div>
         <button id="tombol-tambah-klub-baru" class="tombol-utama">+ Add New Club</button>
-        <button id="tombol-reset-total" class="tombol-bahaya">Reset All Data</button>
     </div>
 
     <div id="halaman-daftar-hari" class="page hidden">
@@ -93,7 +71,7 @@
         
         <button id="tombol-share-klasemen" class="tombol-utama">Save as Image</button>
         
-        <div id="container-klasemen-umum"></div>
+        <div id="container-daftar-klub"></div>
     </div>
 
     <script src="script.js"></script>
