@@ -425,6 +425,13 @@ input[type="text"]:focus, input[type="password"]:focus, select:focus {
 #container-klasemen-umum tr:nth-of-type(even) { background-color: #fcfcfc; }
 #container-klasemen-umum tr:hover { background-color: #f1f1f1; }
 
+#container-klasemen-umum table { 
+    margin: 0 auto 2rem auto; 
+    width: 100%; 
+    max-width: 600px; /* <--- TAMBAHKAN ATAU SESUAIKAN BARIS INI */
+    border-collapse: collapse; 
+    font-size: 0.95rem; 
+}
 
 /* =====================================================================
    TAMPILAN MATCH FINAL (Kompak, Kiri-Kanan, & Mobile Friendly)
