@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tennis Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div id="halaman-autentikasi" class="page">
         <h1>Welcome to Tennis Club Manager</h1>
         <p class="subtitle">by ryankimi</p> 
         <div id="konten-autentikasi">
-            
             <div id="form-login">
                 <h3>Login</h3>
                 <input type="text" id="login-username" placeholder="Username">
@@ -20,7 +19,6 @@
                 <button id="tombol-login" class="tombol-utama">Login</button>
                 <p>Don't have an account? <a href="#" id="link-ke-register">Register here</a></p>
             </div>
-            
             <div id="form-register" class="hidden">
                 <h3>Register</h3>
                 <input type="text" id="register-username" placeholder="Username">
@@ -35,48 +33,47 @@
         <button id="tombol-logout" class="tombol-bahaya">Logout</button>
         <h1>Tennis Club Manager</h1>
         <p class="subtitle">by ryankimi</p>
-        
         <h3>CLUB LIST</h3>
-        <div id="container-daftar-klub">
-            </div>
+        <div id="container-daftar-klub"></div>
         <button id="tombol-tambah-klub-baru" class="tombol-utama">+ Add New Club</button>
         <button id="tombol-reset-total" class="tombol-bahaya">Reset All Data</button>
     </div>
 
     <div id="halaman-daftar-hari" class="page hidden">
-        <button class="tombol-kembali" id="kembali-ke-daftar-klub">Back to Club List</button>
+        <button class="tombol-kembali" id="kembali-ke-daftar-klub">&larr; Back to Club List</button>
         <h2 id="display-nama-klub-di-daftar-hari"></h2>
         <h3>TOURNAMENT DAYS</h3>
         <div id="container-daftar-hari"></div>
         <button id="tombol-tambah-hari-baru">+ Add New Day</button>
-        <button id="tombol-lihat-klasemen" class="tombol-utama">View Overall Standings</button>
+        <button id="tombol-lihat-klasemen" class="tombol-utama">View Standings</button>
     </div>
 
     <div id="halaman-utama" class="page hidden">
-        <button class="tombol-kembali" id="kembali-ke-daftar-hari">Back to Day List</button>
+        <button class="tombol-kembali" id="kembali-ke-daftar-hari">&larr; Back to Day List</button>
         <h2 id="display-nama-klub-di-utama"></h2>
         <h3 id="judul-hari-aktif"></h3>
-        
-        <div id="konten-setup" class="konten-tab">
+        <div id="konten-setup">
             <div id="pilihan-tipe-pertandingan">
                 <h3>CHOOSE MATCH TYPE</h3>
-                <button id="tombol-single">SINGLE</button>
-                <button id="tombol-double">DOUBLE</button>
+                <button id="tombol-single" class="tombol-pilihan">SINGLE</button>
+                <button id="tombol-double" class="tombol-pilihan">DOUBLE</button>
             </div>
             <div id="setup-pemain-dan-match" class="hidden">
-                <div class="pemain-section">
-                    <h3>ADD PLAYER NAME</h3>
-                    <input id="input-nama-pemain" type="text" placeholder="Enter player name">
-                    <button id="tombol-tambah-pemain">Add Player</button>
-                    <h4>Player List</h4>
+                <div class="pemain-section section-card">
+                    <h3>ADD PLAYER</h3>
+                    <div class="input-group">
+                        <input id="input-nama-pemain" type="text" placeholder="Enter player name">
+                        <button id="tombol-tambah-pemain">Add</button>
+                    </div>
+                    <h4>Player List <span class="instruction">(drag player to a match slot)</span></h4>
                     <div id="daftar-pemain" class="kotak-daftar-pemain"></div>
                 </div>
                 <div class="pertandingan-section">
-                    <h3>MATCHES (Ongoing)</h3>
+                    <h3>ONGOING MATCHES</h3>
                     <div id="wadah-pertandingan"></div>
-                    <button id="tombol-tambah-match" class="hidden">+ Add Match</button>
+                    <button id="tombol-tambah-match" class="hidden tombol-utama">+ Add Match</button>
                     <hr class="pemisah-match">
-                    <h3>MATCHES (Finished)</h3>
+                    <h3>FINISHED MATCHES</h3>
                     <div id="wadah-pertandingan-selesai"></div>
                 </div>
             </div>
@@ -84,13 +81,18 @@
     </div>
 
     <div id="halaman-klasemen-umum" class="page hidden">
-        <button class="tombol-kembali" id="kembali-dari-klasemen">Back to Day List</button>
+        <button class="tombol-kembali" id="kembali-dari-klasemen">&larr; Back to Day List</button>
         <h2 id="display-nama-klub-di-klasemen"></h2>
-        <h3>OVERALL PLAYER STANDINGS</h3>
+        <h3>PLAYER STANDINGS</h3>
+        
+        <div class="filter-klasemen">
+            <label for="filter-hari">View Standings for:</label>
+            <select id="filter-hari"></select>
+        </div>
+
         <div id="container-klasemen-umum"></div>
     </div>
 
     <script src="script.js"></script>
 </body>
-
 </html>
