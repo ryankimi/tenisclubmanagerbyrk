@@ -531,41 +531,55 @@ tombolShareKlasemen.addEventListener('click', () => {
     const filterDropdown = document.getElementById('filter-hari');
     const selectedOption = filterDropdown.options[filterDropdown.selectedIndex];
 
-    // 1. Buat elemen judul (h3) secara dinamis
-    const titleElement = document.createElement('h3');
-    titleElement.textContent = selectedOption.text; // Mengambil teks dari pilihan (e.g., "Overall (All Days)" atau "Day 1")
+    // Simpan gaya asli
+    const originalContainerStyle = containerKlasemen.style.cssText; 
+    const originalTableStyle = containerKlasemen.querySelector('table') ? containerKlasemen.querySelector('table').style.cssText : '';
     
-    // Beri sedikit style agar judul terlihat bagus di gambar
+    // Siapkan judul
+    const titleElement = document.createElement('h3');
+    titleElement.textContent = selectedOption.text;
     titleElement.style.textAlign = 'center';
     titleElement.style.marginBottom = '1rem';
     titleElement.style.color = '#343a40';
     titleElement.style.fontWeight = '600';
-
-    // 2. Masukkan judul ini ke bagian paling atas kontainer klasemen (SEMENTARA)
     containerKlasemen.prepend(titleElement);
 
-    // Ubah teks tombol menjadi "Generating..."
     tombolShareKlasemen.textContent = 'Generating...';
     tombolShareKlasemen.disabled = true;
 
-    // Gunakan html2canvas untuk mengambil gambar dari kontainer (yang sekarang sudah ada judulnya)
+    // --- Penyesuaian sementara untuk pengambilan gambar ---
+    // Atur lebar kontainer dan tabel agar tidak terpotong saat mengambil gambar
+    // Kita paksa lebar tertentu yang cukup untuk tabel penuh
+    containerKlasemen.style.width = 'fit-content'; 
+    containerKlasemen.style.maxWidth = 'none';
+    if (containerKlasemen.querySelector('table')) {
+        containerKlasemen.querySelector('table').style.width = 'auto'; // Agar tabel tidak terpaksa 100% jika kecil
+        containerKlasemen.querySelector('table').style.maxWidth = 'none'; // Hilangkan batasan max-width
+    }
+    
+    // Tentukan lebar gambar yang diinginkan (contoh: 700px atau lebih sesuai kebutuhan)
+    const desiredWidth = Math.max(containerKlasemen.offsetWidth, 700); // Ambil lebar aktual atau minimal 700px
+    // --- Akhir penyesuaian sementara ---
+
     html2canvas(containerKlasemen, {
-        scale: 2 // Tingkatkan skala untuk kualitas gambar yang lebih baik
+        scale: 2, // Tingkatkan skala untuk kualitas gambar yang lebih baik
+        width: desiredWidth, // Paksa lebar output gambar
+        // height: containerKlasemen.offsetHeight // Opsional: paksa tinggi output gambar
     }).then(canvas => {
-        // Buat nama file dinamis
         const fileNameText = selectedOption.text.replace(/ /g, '_').toLowerCase();
         const fileName = `standings_${fileNameText}.png`;
 
-        // Buat link sementara untuk memicu unduhan
         const link = document.createElement('a');
         link.download = fileName;
         link.href = canvas.toDataURL('image/png');
         link.click();
     }).finally(() => {
-        // 3. SETELAH SELESAI, HAPUS LAGI elemen judul dari halaman web
+        // Kembalikan semua gaya ke kondisi semula
+        containerKlasemen.style.cssText = originalContainerStyle;
+        if (containerKlasemen.querySelector('table')) {
+            containerKlasemen.querySelector('table').style.cssText = originalTableStyle;
+        }
         titleElement.remove();
-
-        // 4. Kembalikan tombol ke keadaan semula
         tombolShareKlasemen.textContent = originalButtonText;
         tombolShareKlasemen.disabled = false;
     });
