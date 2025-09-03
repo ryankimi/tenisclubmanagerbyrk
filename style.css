@@ -509,3 +509,7 @@ input[type="text"]:focus, input[type="password"]:focus, select:focus {
 .pemain-section, .pertandingan-section {
     width: 100%;
 }
+
+#tombol-share-klasemen {
+    margin-bottom: 1.5rem;
+}
