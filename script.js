@@ -62,7 +62,7 @@ const wadahPertandinganSelesai = document.getElementById('wadah-pertandingan-sel
 const kembaliDariKlasemen = document.getElementById('kembali-dari-klasemen');
 const displayNamaKlubDiKlasemen = document.getElementById('display-nama-klub-di-klasemen');
 const containerKlasemenUmum = document.getElementById('container-klasemen-umum');
-
+const tombolShareKlasemen = document.getElementById('tombol-share-klasemen');
 
 // =====================================================================
 // AUTHENTICATION & API FUNCTIONS
@@ -523,6 +523,52 @@ tombolLihatKlasemen.addEventListener('click', () => {
     populateFilterHari(); 
     tampilkanKlasemen(); 
     tampilkanHalaman('halaman-klasemen-umum');
+});
+
+tombolShareKlasemen.addEventListener('click', () => {
+    const containerKlasemen = document.getElementById('container-klasemen-umum');
+    const originalButtonText = tombolShareKlasemen.textContent;
+    const filterDropdown = document.getElementById('filter-hari');
+    const selectedOption = filterDropdown.options[filterDropdown.selectedIndex];
+
+    // 1. Buat elemen judul (h3) secara dinamis
+    const titleElement = document.createElement('h3');
+    titleElement.textContent = selectedOption.text; // Mengambil teks dari pilihan (e.g., "Overall (All Days)" atau "Day 1")
+    
+    // Beri sedikit style agar judul terlihat bagus di gambar
+    titleElement.style.textAlign = 'center';
+    titleElement.style.marginBottom = '1rem';
+    titleElement.style.color = '#343a40';
+    titleElement.style.fontWeight = '600';
+
+    // 2. Masukkan judul ini ke bagian paling atas kontainer klasemen (SEMENTARA)
+    containerKlasemen.prepend(titleElement);
+
+    // Ubah teks tombol menjadi "Generating..."
+    tombolShareKlasemen.textContent = 'Generating...';
+    tombolShareKlasemen.disabled = true;
+
+    // Gunakan html2canvas untuk mengambil gambar dari kontainer (yang sekarang sudah ada judulnya)
+    html2canvas(containerKlasemen, {
+        scale: 2 // Tingkatkan skala untuk kualitas gambar yang lebih baik
+    }).then(canvas => {
+        // Buat nama file dinamis
+        const fileNameText = selectedOption.text.replace(/ /g, '_').toLowerCase();
+        const fileName = `standings_${fileNameText}.png`;
+
+        // Buat link sementara untuk memicu unduhan
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }).finally(() => {
+        // 3. SETELAH SELESAI, HAPUS LAGI elemen judul dari halaman web
+        titleElement.remove();
+
+        // 4. Kembalikan tombol ke keadaan semula
+        tombolShareKlasemen.textContent = originalButtonText;
+        tombolShareKlasemen.disabled = false;
+    });
 });
 
 function populateFilterHari() {
