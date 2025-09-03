@@ -424,3 +424,80 @@ input[type="text"]:focus, input[type="password"]:focus, select:focus {
 #container-klasemen-umum tr:last-child td { border-bottom: none; }
 #container-klasemen-umum tr:nth-of-type(even) { background-color: #fcfcfc; }
 #container-klasemen-umum tr:hover { background-color: #f1f1f1; }
+
+/* =====================================================================
+   RESPONSIVE STYLES (MOBILE FRIENDLY)
+   ===================================================================== */
+
+/* Terapkan gaya ini untuk layar dengan lebar 768px ke bawah (ukuran tablet & HP) */
+@media (max-width: 768px) {
+
+    /* 1. Perkecil padding agar konten tidak terlalu sempit */
+    body {
+        padding: 1rem 0.5rem;
+    }
+    .page {
+        padding: 1.5rem;
+        padding-top: 5rem; /* Beri ruang lebih di atas untuk tombol */
+    }
+
+    /* 2. Sesuaikan ukuran font agar tidak terlalu besar */
+    h1 { font-size: 1.8rem; }
+    #halaman-autentikasi h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.2rem; }
+    .nama-klub-item { font-size: 1.1rem; }
+
+
+    /* 3. Susun kotak pertandingan (match box) ke bawah, bukan menyamping */
+    .match-layout-container {
+        flex-direction: column; /* Ubah dari baris menjadi kolom */
+        gap: 1.5rem; /* Tambah jarak antar tim */
+    }
+    .vs-separator {
+        /* Putar tanda VS agar sesuai dengan tata letak baru */
+        transform: rotate(90deg);
+    }
+    .tim {
+        width: 100%; /* Pastikan lebar tim penuh */
+    }
+    
+
+    /* 4. Atur ulang posisi tombol-tombol di pojok agar tidak tumpang tindih */
+    .tombol-kembali {
+        top: 15px;
+        left: 15px;
+    }
+    #tombol-logout {
+        top: 15px;
+        right: 15px;
+    }
+    /* Pindahkan tombol reset di bawah tombol logout */
+    #tombol-reset-total {
+        top: 60px; 
+        right: 15px;
+    }
+    
+
+    /* 5. Pastikan grup input dan tombol terlihat bagus */
+    .input-group {
+        flex-direction: column; /* Susun input dan tombol ke bawah */
+        align-items: stretch; /* Buat lebar elemen sama */
+        gap: 0.75rem;
+    }
+    .input-group button {
+        width: 100%;
+    }
+
+
+    /* 6. Atur ulang tombol pilihan tipe pertandingan */
+    #pilihan-tipe-pertandingan {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .tombol-pilihan {
+        width: 100%;
+        margin: 0;
+    }
+}
