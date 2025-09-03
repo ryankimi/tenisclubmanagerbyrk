@@ -514,6 +514,9 @@ function nomorUlangMatch() {
 // STANDINGS PAGE FUNCTIONS & EVENT LISTENERS
 // =====================================================================
 // ... (Semua fungsi klasemen tetap sama, tidak perlu diubah)
+kembaliDariKlasemen.addEventListener('click', () => {
+    tampilkanHalaman('halaman-daftar-hari');
+});
 tombolLihatKlasemen.addEventListener('click', () => {
     const club = getActiveClub();
     if (!club) return;
