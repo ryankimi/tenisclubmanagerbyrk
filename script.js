@@ -42,7 +42,6 @@ const containerDaftarHari = document.getElementById('container-daftar-hari');
 const tombolTambahHariBaru = document.getElementById('tombol-tambah-hari-baru');
 const tombolLihatKlasemen = document.getElementById('tombol-lihat-klasemen');
 
-
 // Main Setup Page Elements
 // PERBAIKAN: Baris duplikat dihapus dari sini.
 const kembaliKeDaftarHari = document.getElementById('kembali-ke-daftar-hari'); 
@@ -64,9 +63,6 @@ const kembaliDariKlasemen = document.getElementById('kembali-dari-klasemen');
 const displayNamaKlubDiKlasemen = document.getElementById('display-nama-klub-di-klasemen');
 const containerKlasemenUmum = document.getElementById('container-klasemen-umum');
 
-kembaliDariKlasemen.addEventListener('click', () => {
-    tampilkanHalaman('halaman-daftar-hari');
-});
 
 // =====================================================================
 // AUTHENTICATION & API FUNCTIONS
@@ -509,52 +505,47 @@ function nomorUlangMatch() {
 }
 
 // =====================================================================
-// STANDINGS PAGE FUNCTIONS
+// STANDINGS PAGE FUNCTIONS & EVENT LISTENERS
 // =====================================================================
+
+// Event listener untuk tombol kembali dari halaman klasemen
+kembaliDariKlasemen.addEventListener('click', () => {
+    tampilkanHalaman('halaman-daftar-hari');
+});
 
 // Event listener BARU untuk tombol lihat klasemen
 tombolLihatKlasemen.addEventListener('click', () => {
     const club = getActiveClub();
     if (!club) return;
     
-    // Mengisi nama klub di halaman klasemen
     displayNamaKlubDiKlasemen.textContent = club.clubName;
     
-    // Mempersiapkan dan menampilkan halaman klasemen
     populateFilterHari(); 
     tampilkanKlasemen(); 
     tampilkanHalaman('halaman-klasemen-umum');
 });
 
-// Fungsi untuk mengisi pilihan filter hari
 function populateFilterHari() {
     const club = getActiveClub();
     const filterDropdown = document.getElementById('filter-hari');
-    filterDropdown.innerHTML = ''; // Kosongkan pilihan lama
+    filterDropdown.innerHTML = ''; 
 
-    // Tambahkan opsi untuk melihat klasemen keseluruhan
     filterDropdown.innerHTML += `<option value="overall">Overall (All Days)</option>`;
 
-    // Tambahkan opsi untuk setiap hari yang ada
     if (club && club.days) {
         club.days.forEach(day => {
             filterDropdown.innerHTML += `<option value="${day.id}">${day.name}</option>`;
         });
     }
-
-    // Tambahkan event listener agar klasemen diperbarui saat filter diubah
     filterDropdown.onchange = () => tampilkanKlasemen();
 }
 
-// Fungsi utama untuk menghitung dan menampilkan tabel klasemen
-// Fungsi utama untuk menghitung dan menampilkan tabel klasemen (VERSI BARU)
 function tampilkanKlasemen() {
     const club = getActiveClub();
     const filterValue = document.getElementById('filter-hari').value;
     
     let semuaPertandingan = [];
 
-    // Kumpulkan data pertandingan berdasarkan filter yang dipilih
     if (filterValue === 'overall') {
         club.days.forEach(day => {
             semuaPertandingan.push(...day.matchResults);
@@ -566,7 +557,6 @@ function tampilkanKlasemen() {
         }
     }
 
-    // Hitung statistik untuk setiap pemain
     const statistikPemain = {};
 
     semuaPertandingan.forEach(match => {
@@ -579,14 +569,12 @@ function tampilkanKlasemen() {
         const skorTim1 = skor[0];
         const skorTim2 = skor[1];
         
-        // ---- PERUBAHAN DIMULAI DI SINI ----
-        // Logika untuk menyatukan nama pemain (case-insensitive)
         const allPlayers = [...pemainTim1, ...pemainTim2];
         allPlayers.forEach(namaPemain => {
-            const key = namaPemain.toLowerCase(); // Gunakan nama lowercase sebagai kunci unik
+            const key = namaPemain.toLowerCase();
             if (!statistikPemain[key]) {
                 statistikPemain[key] = {
-                    originalName: namaPemain, // Simpan nama asli untuk ditampilkan
+                    originalName: namaPemain,
                     setDimainkan: 0,
                     setMenang: 0
                 };
@@ -606,14 +594,13 @@ function tampilkanKlasemen() {
         });
     });
 
-    // Ubah data statistik menjadi array agar bisa diurutkan dan ditampilkan
     const dataKlasemen = Object.values(statistikPemain).map(stats => {
         const setKalah = stats.setDimainkan - stats.setMenang;
         const winPercentage = stats.setDimainkan > 0 ? (stats.setMenang / stats.setDimainkan) * 100 : 0;
         const poin = stats.setMenang * 10;
 
         return {
-            nama: stats.originalName, // Gunakan nama asli yang disimpan
+            nama: stats.originalName,
             setDimainkan: stats.setDimainkan,
             setMenang: stats.setMenang,
             setKalah,
@@ -621,16 +608,11 @@ function tampilkanKlasemen() {
             poin
         };
     });
-    // ---- PERUBAHAN SELESAI DI SINI ----
 
-    // Urutkan klasemen berdasarkan poin (tertinggi ke terendah), lalu win%
     dataKlasemen.sort((a, b) => b.poin - a.poin || b.winPercentage - a.winPercentage);
-
-    // Render tabel HTML
     renderTabelKlasemen(dataKlasemen);
 }
 
-// Fungsi untuk membuat HTML tabel klasemen
 function renderTabelKlasemen(data) {
     const container = document.getElementById('container-klasemen-umum');
     
@@ -639,17 +621,18 @@ function renderTabelKlasemen(data) {
         return;
     }
 
+    // ---- HEADER DIUBAH UNTUK MENAMBAHKAN KATA "SET" ----
     let tableHTML = `
         <table>
             <thead>
                 <tr>
-                    <th>Rank</th>
+                    <th>Rk</th>
                     <th>Player</th>
-                    <th>Sets Played</th>
+                    <th>Sets Pld</th>
                     <th>Sets Won</th>
                     <th>Sets Lost</th>
-                    <th>Win %</th>
-                    <th>Points</th>
+                    <th>W%</th>
+                    <th>Pts</th>
                 </tr>
             </thead>
             <tbody>
@@ -672,8 +655,6 @@ function renderTabelKlasemen(data) {
     tableHTML += `</tbody></table>`;
     container.innerHTML = tableHTML;
 }
-
-
 
 // =====================================================================
 // INITIAL LOAD
