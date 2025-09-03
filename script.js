@@ -15,12 +15,13 @@ let activeUser = null;
 
 // Pages
 const semuaHalaman = document.querySelectorAll('.page');
+const halamanAutentikasi = document.getElementById('halaman-autentikasi');
 const halamanDaftarKlub = document.getElementById('halaman-daftar-klub');
 const halamanDaftarHari = document.getElementById('halaman-daftar-hari');
 const halamanUtama = document.getElementById('halaman-utama');
 const halamanKlasemenUmum = document.getElementById('halaman-klasemen-umum');
-// Autentikasi
-const halamanAutentikasi = document.getElementById('halaman-autentikasi');
+
+// Auth Elements
 const formLogin = document.getElementById('form-login');
 const formRegister = document.getElementById('form-register');
 const tombolLogin = document.getElementById('tombol-login');
@@ -41,8 +42,10 @@ const containerDaftarHari = document.getElementById('container-daftar-hari');
 const tombolTambahHariBaru = document.getElementById('tombol-tambah-hari-baru');
 const tombolLihatKlasemen = document.getElementById('tombol-lihat-klasemen');
 
+
 // Main Setup Page Elements
-const kembaliKeDaftarHari = document.getElementById('kembali-ke-daftar-hari');
+// PERBAIKAN: Baris duplikat dihapus dari sini.
+const kembaliKeDaftarHari = document.getElementById('kembali-ke-daftar-hari'); 
 const displayNamaKlubDiUtama = document.getElementById('display-nama-klub-di-utama');
 const judulHariAktif = document.getElementById('judul-hari-aktif');
 const pilihanTipePertandingan = document.getElementById('pilihan-tipe-pertandingan');
@@ -61,121 +64,92 @@ const kembaliDariKlasemen = document.getElementById('kembali-dari-klasemen');
 const displayNamaKlubDiKlasemen = document.getElementById('display-nama-klub-di-klasemen');
 const containerKlasemenUmum = document.getElementById('container-klasemen-umum');
 
-
-// =====================================================================
-// AUTHENTICATION (LOGIN & REGISTER)
-// =====================================================================
-// Fungsi untuk beralih antara form login dan register
-linkKeRegister.addEventListener('click', () => {
-    formLogin.classList.add('hidden');
-    formRegister.classList.remove('hidden');
+kembaliDariKlasemen.addEventListener('click', () => {
+    tampilkanHalaman('halaman-daftar-hari');
 });
 
-linkKeLogin.addEventListener('click', () => {
-    formRegister.classList.add('hidden');
-    formLogin.classList.remove('hidden');
-});
+// =====================================================================
+// AUTHENTICATION & API FUNCTIONS
+// =====================================================================
+linkKeRegister.addEventListener('click', (e) => { e.preventDefault(); formLogin.classList.add('hidden'); formRegister.classList.remove('hidden'); });
+linkKeLogin.addEventListener('click', (e) => { e.preventDefault(); formRegister.classList.add('hidden'); formLogin.classList.remove('hidden'); });
 
-// Penanganan Register dengan JSONBin
 tombolRegister.addEventListener('click', async () => {
-    const username = document.getElementById('register-username').value;
-    const password = document.getElementById('register-password').value;
-
-    if (!username || !password) {
-        alert("Username and password cannot be empty.");
-        return;
-    }
+    const username = document.getElementById('register-username').value.trim();
+    const password = document.getElementById('register-password').value.trim();
+    if (!username || !password) return alert("Username and password cannot be empty.");
 
     try {
         const data = await loadFromJSONBin();
-        if (data.users[username]) {
-            alert("Username already exists. Please choose another one.");
-            return;
+        if (data.users && data.users[username]) {
+            return alert("Username already exists. Please choose another one.");
         }
-
-        data.users[username] = {
-            password: password,
-            clubsData: []
-        };
-
+        if (!data.users) data.users = {};
+        data.users[username] = { password: password, clubsData: [] };
         await saveToJSONBin(data);
         alert("Registration successful! You can now log in.");
         formRegister.classList.add('hidden');
         formLogin.classList.remove('hidden');
     } catch (error) {
-        alert("Registration failed. Please try again later.");
+        alert("Registration failed. Could not connect to the database.");
         console.error("Error during registration:", error);
     }
 });
 
-// Penanganan Login dengan JSONBin
 tombolLogin.addEventListener('click', async () => {
-    const username = document.getElementById('login-username').value;
-    const password = document.getElementById('login-password').value;
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+    if (!username || !password) return alert("Username and password cannot be empty.");
 
     try {
         const data = await loadFromJSONBin();
-        const userData = data.users[username];
+        const userData = data.users ? data.users[username] : undefined;
 
         if (userData && userData.password === password) {
             activeUser = username;
             tennisAppClubs = userData.clubsData || [];
             renderDaftarKlub();
             tampilkanHalaman('halaman-daftar-klub');
-            alert("Login successful!");
         } else {
             alert("Invalid username or password.");
         }
     } catch (error) {
-        alert("Login failed. Please try again later.");
+        alert("Login failed. Could not connect to the database.");
         console.error("Error during login:", error);
     }
 });
 
-// Penanganan Logout
 tombolLogout.addEventListener('click', () => {
     activeUser = null;
     tennisAppClubs = [];
+    activeClubId = null;
+    activeDayId = null;
     tampilkanHalaman('halaman-autentikasi');
 });
 
-
-// =====================================================================
-// JSONBIN API FUNCTIONS
-// =====================================================================
 async function saveToJSONBin(data) {
-    const headers = {
-        'Content-Type': 'application/json',
-        'X-Master-Key': JSONBIN_API_KEY
-    };
-    const response = await fetch(JSONBIN_API_URL, {
-        method: 'PUT',
-        headers: headers,
-        body: JSON.stringify(data)
-    });
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to save data to JSONBin: ${response.status} - ${errorText}`);
-    }
+    const headers = { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY };
+    const response = await fetch(JSONBIN_API_URL, { method: 'PUT', headers: headers, body: JSON.stringify(data) });
+    if (!response.ok) throw new Error(`Failed to save data: ${response.status}`);
 }
 
 async function loadFromJSONBin() {
-    const headers = {
-        'X-Master-Key': JSONBIN_API_KEY
-    };
-    const response = await fetch(`${JSONBIN_API_URL}/latest`, {
-        headers: headers
-    });
+    const headers = { 'X-Master-Key': JSONBIN_API_KEY };
+    const response = await fetch(`${JSONBIN_API_URL}/latest`, { headers: headers, cache: 'no-store' });
     if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to load data from JSONBin: ${response.status} - ${errorText}`);
+        if (response.status === 404) {
+            console.log("Bin not found, creating a new one.");
+            await saveToJSONBin({ users: {} });
+            return { users: {} };
+        }
+        throw new Error(`Failed to load data: ${response.status}`);
     }
     const data = await response.json();
     return data.record;
 }
 
 // =====================================================================
-// CORE FUNCTIONS: NAVIGATION, SAVE, LOAD
+// CORE FUNCTIONS
 // =====================================================================
 function tampilkanHalaman(idHalaman) {
     semuaHalaman.forEach(h => h.classList.add('hidden'));
@@ -197,43 +171,28 @@ async function saveState() {
             day.matchesHTML.finished = wadahPertandinganSelesai.innerHTML;
         }
     }
-
     try {
         const allData = await loadFromJSONBin();
+        if (!allData.users) allData.users = {};
         allData.users[activeUser].clubsData = tennisAppClubs;
         await saveToJSONBin(allData);
-        console.log("Data saved to JSONBin!");
     } catch (error) {
-        console.error("Error saving data:", error);
-        alert("Failed to save data. Please check your internet connection.");
+        console.error("Error saving state:", error);
     }
 }
 
-async function loadState() {
+async function initializeApp() {
     try {
-        const data = await loadFromJSONBin();
-        if (data.users) {
-            tampilkanHalaman('halaman-autentikasi');
-        } else {
-            const initialData = { users: {} };
-            await saveToJSONBin(initialData);
-            tampilkanHalaman('halaman-autentikasi');
-        }
+        await loadFromJSONBin(); // Cukup panggil untuk memastikan bin ada
+        tampilkanHalaman('halaman-autentikasi');
     } catch (error) {
-        // Jika bin kosong atau tidak ditemukan, buat bin baru
-        if (error.message.includes('bin not found') || error.message.includes('404')) {
-            const initialData = { users: {} };
-            await saveToJSONBin(initialData);
-            tampilkanHalaman('halaman-autentikasi');
-        } else {
-            console.error("Error loading initial data:", error);
-            alert("Failed to load application data. Please check your internet connection or API key.");
-        }
+        console.error("Error initializing app:", error);
+        alert("Could not initialize the application. Please check your API keys and Bin ID in script.js.");
     }
 }
 
 // =====================================================================
-// DRAG-AND-DROP LOGIC
+// DRAG-AND-DROP LOGIC & HELPERS
 // =====================================================================
 daftarPemain.addEventListener('dragstart', (event) => {
     if (event.target.classList.contains('item-pemain')) {
@@ -252,13 +211,7 @@ function drop(event) {
         event.target.appendChild(elemenBaruDiSlot);
     }
 }
-
-// =====================================================================
-// HELPER FUNCTIONS
-// =====================================================================
-function getActiveClub() {
-    return tennisAppClubs.find(c => c.clubId === activeClubId);
-}
+function getActiveClub() { return tennisAppClubs.find(c => c.clubId === activeClubId); }
 function getActiveDay() {
     const club = getActiveClub();
     if (!club || activeDayId === null) return null;
@@ -296,11 +249,6 @@ function pasangUlangEventListeners() {
         if (tombolSave) tombolSave.onclick = () => saveMatch(matchId);
     });
 }
-// =====================================================================
-// PAGE LOGIC & EVENT LISTENERS
-// =====================================================================
-
-// --- Club List Page ---
 tombolTambahKlubBaru.addEventListener('click', async () => {
     const namaKlub = prompt("Enter new club name:");
     if (namaKlub && namaKlub.trim() !== '') {
@@ -310,25 +258,16 @@ tombolTambahKlubBaru.addEventListener('click', async () => {
     }
 });
 tombolResetTotal.addEventListener('click', async () => {
-    if (confirm('Are you sure you want to delete ALL data? This action cannot be undone.')) {
+    if (confirm('Are you sure you want to delete ALL users and data? This action cannot be undone.')) {
         await saveToJSONBin({ users: {} });
         location.reload();
     }
 });
 function renderDaftarKlub() {
     containerDaftarKlub.innerHTML = '';
-    if (tennisAppClubs.length > 0) {
+    if (tennisAppClubs && tennisAppClubs.length > 0) {
         tennisAppClubs.forEach(club => {
-            const itemHTML = `
-                <div class="klub-item-container">
-                    <span class="nama-klub-item">${club.clubName}</span>
-                    <div class="klub-item-actions">
-                        <button onclick="renameKlub(${club.clubId})">&#9998;</button>
-                        <button class="tombol-buka-klub" onclick="muatKlub(${club.clubId})">Open</button>
-                        <button class="tombol-hapus-hari" onclick="hapusKlub(${club.clubId})">&times;</button>
-                    </div>
-                </div>
-            `;
+            const itemHTML = `<div class="klub-item-container"><span class="nama-klub-item">${club.clubName}</span><div class="klub-item-actions"><button onclick="renameKlub(${club.clubId})">&#9998;</button><button class="tombol-buka-klub" onclick="muatKlub(${club.clubId})">Open</button><button class="tombol-hapus-hari" onclick="hapusKlub(${club.clubId})">&times;</button></div></div>`;
             containerDaftarKlub.insertAdjacentHTML('beforeend', itemHTML);
         });
     } else {
@@ -360,16 +299,14 @@ function muatKlub(clubId) {
     renderDaftarHari();
     tampilkanHalaman('halaman-daftar-hari');
 }
-
-// --- Day List Page ---
 kembaliKeDaftarKlub.addEventListener('click', () => {
     activeClubId = null;
-    saveState();
     tampilkanHalaman('halaman-daftar-klub');
 });
 tombolTambahHariBaru.addEventListener('click', () => {
     const club = getActiveClub();
     if (!club) return;
+    if(!club.days) club.days = [];
     const nomorHariBaru = (club.days.length || 0) + 1;
     club.days.push({ id: Date.now(), name: `Day ${nomorHariBaru}`, type: null, players: [], matchResults: [], matchesHTML: { active: '', finished: '' }, nextMatchNum: 1 });
     renderDaftarHari();
@@ -378,7 +315,7 @@ tombolTambahHariBaru.addEventListener('click', () => {
 function renderDaftarHari() {
     const club = getActiveClub();
     containerDaftarHari.innerHTML = '';
-    if (club && club.days.length > 0) {
+    if (club && club.days && club.days.length > 0) {
         club.days.forEach(day => {
             const container = document.createElement('div');
             container.className = 'hari-item-container';
@@ -448,21 +385,11 @@ function muatHari(dayId) {
     tampilkanHalaman('halaman-utama');
     pasangUlangEventListeners();
 }
-
-// --- Main Setup Page ---
 kembaliKeDaftarHari.addEventListener('click', () => {
     activeDayId = null;
     saveState();
     tampilkanHalaman('halaman-daftar-hari');
 });
-tombolLihatKlasemen.addEventListener('click', () => {
-    const club = getActiveClub();
-    if (!club) return;
-    displayNamaKlubDiKlasemen.textContent = club.clubName;
-    renderKlasemenUmum();
-    tampilkanHalaman('halaman-klasemen-umum');
-});
-kembaliDariKlasemen.addEventListener('click', () => tampilkanHalaman('halaman-daftar-hari'));
 tombolSingle.addEventListener('click', () => handleTipeDipilih('single'));
 tombolDouble.addEventListener('click', () => handleTipeDipilih('double'));
 function handleTipeDipilih(tipe) {
@@ -580,51 +507,175 @@ function nomorUlangMatch() {
     });
     day.nextMatchNum = semuaMatchBoxes.length + 1;
 }
-function renderKlasemenUmum() {
+
+// =====================================================================
+// STANDINGS PAGE FUNCTIONS
+// =====================================================================
+
+// Event listener BARU untuk tombol lihat klasemen
+tombolLihatKlasemen.addEventListener('click', () => {
     const club = getActiveClub();
-    const statistikPemain = {};
-    const semuaPemain = new Set();
+    if (!club) return;
+    
+    // Mengisi nama klub di halaman klasemen
+    displayNamaKlubDiKlasemen.textContent = club.clubName;
+    
+    // Mempersiapkan dan menampilkan halaman klasemen
+    populateFilterHari(); 
+    tampilkanKlasemen(); 
+    tampilkanHalaman('halaman-klasemen-umum');
+});
+
+// Fungsi untuk mengisi pilihan filter hari
+function populateFilterHari() {
+    const club = getActiveClub();
+    const filterDropdown = document.getElementById('filter-hari');
+    filterDropdown.innerHTML = ''; // Kosongkan pilihan lama
+
+    // Tambahkan opsi untuk melihat klasemen keseluruhan
+    filterDropdown.innerHTML += `<option value="overall">Overall (All Days)</option>`;
+
+    // Tambahkan opsi untuk setiap hari yang ada
     if (club && club.days) {
         club.days.forEach(day => {
-            day.players.forEach(p => semuaPemain.add(p));
+            filterDropdown.innerHTML += `<option value="${day.id}">${day.name}</option>`;
         });
     }
-    semuaPemain.forEach(namaPemain => { statistikPemain[namaPemain] = { main: 0, menang: 0, kalah: 0 }; });
-    if (club && club.days) {
-        club.days.forEach(day => {
-            day.matchResults.forEach(hasil => {
-                const skorBagian = hasil.skor.split('-');
-                if (skorBagian.length < 1) return;
-                const setTim1 = skorBagian[0].trim().split(',').filter(s => s).map(s => parseInt(s));
-                const setTim2 = skorBagian[1] ? skorBagian[1].trim().split(',').filter(s => s).map(s => parseInt(s)) : [];
-                let menangSetTim1 = 0, menangSetTim2 = 0;
-                const iterasi = Math.max(setTim1.length, setTim2.length);
-                for (let i = 0; i < iterasi; i++) {
-                    const s1 = setTim1[i] || 0, s2 = setTim2[i] || 0;
-                    if (s1 > s2) menangSetTim1++; if (s2 > s1) menangSetTim2++;
-                }
-                if (setTim2.length === 0 && setTim1.length > 0 && !isNaN(setTim1[0])) { menangSetTim1 = 1; }
-                const pemainTim1 = hasil.tim1.split(' & ').filter(p => p), pemainTim2 = hasil.tim2.split(' & ').filter(p => p);
-                if (pemainTim1.length === 0 || pemainTim2.length === 0) return;
-                const pemenang = menangSetTim1 > menangSetTim2 ? pemainTim1 : pemainTim2;
-                const kalah = menangSetTim1 > menangSetTim2 ? pemainTim2 : pemainTim1;
-                pemenang.forEach(p => { if (statistikPemain[p]) { statistikPemain[p].main++; statistikPemain[p].menang++; } });
-                kalah.forEach(p => { if (statistikPemain[p]) { statistikPemain[p].main++; statistikPemain[p].kalah++; } });
-            });
-        });
-    }
-    const pemainYangBermain = Object.entries(statistikPemain).filter(([nama, stats]) => stats.main > 0);
-    if (pemainYangBermain.length === 0) { containerKlasemenUmum.innerHTML = `<p>No matches have been completed yet.</p>`; return; }
-    const urutanPemain = pemainYangBermain.sort((a, b) => {
-        const poinB = b[1].menang * 10, poinA = a[1].menang * 10;
-        return poinB - poinA;
-    });
-    let htmlTabel = `<table><tr><th>Player</th><th>Pld</th><th>W</th><th>L</th><th>Win %</th><th>Pts</th></tr>`;
-    urutanPemain.forEach(([nama, stats]) => {
-        const persentaseMenang = (stats.menang / stats.main) * 100;
-        const poin = stats.menang * 10;
-        htmlTabel += `<tr><td>${nama}</td><td>${stats.main}</td><td>${stats.menang}</td><td>${stats.kalah}</td><td>${persentaseMenang.toFixed(0)}%</td><td>${poin}</td></tr>`;
-    });
-    htmlTabel += `</table>`;
-    containerKlasemenUmum.innerHTML = htmlTabel;
+
+    // Tambahkan event listener agar klasemen diperbarui saat filter diubah
+    filterDropdown.onchange = () => tampilkanKlasemen();
 }
+
+// Fungsi utama untuk menghitung dan menampilkan tabel klasemen
+// Fungsi utama untuk menghitung dan menampilkan tabel klasemen (VERSI BARU)
+function tampilkanKlasemen() {
+    const club = getActiveClub();
+    const filterValue = document.getElementById('filter-hari').value;
+    
+    let semuaPertandingan = [];
+
+    // Kumpulkan data pertandingan berdasarkan filter yang dipilih
+    if (filterValue === 'overall') {
+        club.days.forEach(day => {
+            semuaPertandingan.push(...day.matchResults);
+        });
+    } else {
+        const selectedDay = club.days.find(d => d.id == filterValue);
+        if (selectedDay) {
+            semuaPertandingan = selectedDay.matchResults;
+        }
+    }
+
+    // Hitung statistik untuk setiap pemain
+    const statistikPemain = {};
+
+    semuaPertandingan.forEach(match => {
+        const skor = match.skor.split('-').map(s => parseInt(s.trim()));
+        if (skor.length < 2 || isNaN(skor[0]) || isNaN(skor[1])) return;
+
+        const pemainTim1 = match.tim1.split('&').map(p => p.trim());
+        const pemainTim2 = match.tim2.split('&').map(p => p.trim());
+
+        const skorTim1 = skor[0];
+        const skorTim2 = skor[1];
+        
+        // ---- PERUBAHAN DIMULAI DI SINI ----
+        // Logika untuk menyatukan nama pemain (case-insensitive)
+        const allPlayers = [...pemainTim1, ...pemainTim2];
+        allPlayers.forEach(namaPemain => {
+            const key = namaPemain.toLowerCase(); // Gunakan nama lowercase sebagai kunci unik
+            if (!statistikPemain[key]) {
+                statistikPemain[key] = {
+                    originalName: namaPemain, // Simpan nama asli untuk ditampilkan
+                    setDimainkan: 0,
+                    setMenang: 0
+                };
+            }
+        });
+
+        pemainTim1.forEach(p => {
+            const key = p.toLowerCase();
+            statistikPemain[key].setDimainkan += skorTim1 + skorTim2;
+            statistikPemain[key].setMenang += skorTim1;
+        });
+
+        pemainTim2.forEach(p => {
+            const key = p.toLowerCase();
+            statistikPemain[key].setDimainkan += skorTim1 + skorTim2;
+            statistikPemain[key].setMenang += skorTim2;
+        });
+    });
+
+    // Ubah data statistik menjadi array agar bisa diurutkan dan ditampilkan
+    const dataKlasemen = Object.values(statistikPemain).map(stats => {
+        const setKalah = stats.setDimainkan - stats.setMenang;
+        const winPercentage = stats.setDimainkan > 0 ? (stats.setMenang / stats.setDimainkan) * 100 : 0;
+        const poin = stats.setMenang * 10;
+
+        return {
+            nama: stats.originalName, // Gunakan nama asli yang disimpan
+            setDimainkan: stats.setDimainkan,
+            setMenang: stats.setMenang,
+            setKalah,
+            winPercentage,
+            poin
+        };
+    });
+    // ---- PERUBAHAN SELESAI DI SINI ----
+
+    // Urutkan klasemen berdasarkan poin (tertinggi ke terendah), lalu win%
+    dataKlasemen.sort((a, b) => b.poin - a.poin || b.winPercentage - a.winPercentage);
+
+    // Render tabel HTML
+    renderTabelKlasemen(dataKlasemen);
+}
+
+// Fungsi untuk membuat HTML tabel klasemen
+function renderTabelKlasemen(data) {
+    const container = document.getElementById('container-klasemen-umum');
+    
+    if (data.length === 0) {
+        container.innerHTML = '<p>No finished matches to display.</p>';
+        return;
+    }
+
+    let tableHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Sets Played</th>
+                    <th>Sets Won</th>
+                    <th>Sets Lost</th>
+                    <th>Win %</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    data.forEach((pemain, index) => {
+        tableHTML += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${pemain.nama}</td>
+                <td>${pemain.setDimainkan}</td>
+                <td>${pemain.setMenang}</td>
+                <td>${pemain.setKalah}</td>
+                <td>${pemain.winPercentage.toFixed(1)}%</td>
+                <td>${pemain.poin}</td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `</tbody></table>`;
+    container.innerHTML = tableHTML;
+}
+
+
+
+// =====================================================================
+// INITIAL LOAD
+// =====================================================================
+initializeApp();
