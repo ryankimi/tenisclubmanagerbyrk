@@ -347,12 +347,13 @@ input:focus, select:focus {
     overflow: hidden;      /* Sembunyikan teks yang meluber */
     text-overflow: ellipsis; /* Tampilkan "..." untuk teks yang terpotong */
     vertical-align: middle;
+    background-color: var(--primary-color);
+    color: var(--light-color);
+    border-radius: 4px;
+    cursor: pointer;
 }
 .item-pemain:hover {
     background-color: var(--primary-hover);
-}
-.item-pemain:active {
-    cursor: grabbing;
 }
 
 
@@ -392,32 +393,17 @@ input:focus, select:focus {
     position: relative; /* For action buttons positioning */
 }
 
-.match-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline; /* Sejajarkan baseline teks dan tombol */
-    margin-bottom: 0.8rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px dashed var(--border-color);
-    gap: 1rem; 
-}
-
 .judul-match {
-    flex-grow: 1; 
     text-align: left;
     font-size: 1rem;
     font-weight: 600;
     color: var(--dark-color);
     margin: 0;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed var(--border-color);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-}
-
-.match-actions-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem; 
-    flex-shrink: 0; 
 }
 
 .match-action-btn {
@@ -425,7 +411,7 @@ input:focus, select:focus {
     border: none;
     font-size: 1.1rem;
     padding: 5px;
-    margin: 0; /* Margin is handled by the wrapper's gap */
+    margin: 0;
     border-radius: 4px;
     transition: background-color 0.2s ease;
     color: var(--text-muted); /* Default for action buttons */
@@ -434,12 +420,7 @@ input:focus, select:focus {
     background-color: #eee;
     transform: translateY(-1px);
 }
-.tombol-hapus-match {
-    background-color: transparent;
-    color: var(--text-muted);
-    font-size: 1.5rem;
-    line-height: 1;
-}
+
 .tombol-hapus-match:hover {
     color: var(--danger-color);
 }
@@ -456,29 +437,24 @@ input:focus, select:focus {
     transform: translateY(-1px);
 }
 
-/* Tombol Hapus (Ikon 'x') */
 .tombol-hapus-match {
     font-size: 1.8rem;
     line-height: 1;
 }
 .tombol-hapus-match:hover {
     color: var(--danger-color);
-    background-color: rgba(220, 53, 69, 0.1); /* Latar merah samar saat disentuh */
+    background-color: rgba(220, 53, 69, 0.1);
 }
 
-/* Tombol Edit (Ikon 'pensil') */
 .tombol-edit-match {
     font-size: 1.1rem;
 }
 .tombol-edit-match:hover {
     color: var(--primary-color);
-    background-color: rgba(60, 109, 85, 0.1); /* Latar hijau samar saat disentuh */
+    background-color: rgba(60, 109, 85, 0.1);
 }
 
-
-
-
-.tombol-selesai-match {
+.tombol-selesai-match, .tombol-save-match {
     background-color: var(--primary-color);
     color: var(--light-color);
     border: none;
@@ -490,7 +466,7 @@ input:focus, select:focus {
     margin-top: 1rem;
     text-transform: uppercase;
 }
-.tombol-selesai-match:hover {
+.tombol-selesai-match:hover, .tombol-save-match:hover {
     background-color: var(--primary-hover);
 }
 
@@ -501,7 +477,7 @@ input:focus, select:focus {
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 1rem;
-    flex-wrap: wrap; 
+    flex-wrap: nowrap; /* Ensures it stays as a row */
 }
 
 .tim {
@@ -519,35 +495,32 @@ input:focus, select:focus {
     padding: 0 0.5rem;
 }
 
-/* === PERBAIKAN DI SINI === */
 .slot-pemain {
     border: 2px dashed #dcdcdc;
-    min-height: 40px; /* Tinggi minimum dikurangi */
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 5px 0;
-    padding: 4px; /* Padding dikurangi */
+    padding: 4px;
     border-radius: var(--border-radius);
     background-color: #f9f9f9;
-    /* ... properti lainnya ... */
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.slot-pemain:hover {
+    background-color: #e8f5e9;
+    border-color: #4caf50;
 }
 
 /* Placeholder text for empty slots */
 .slot-pemain:empty::before {
-    content: 'Drag Player Here';
+    content: 'Click to Add Player';
     color: #b0b0b0;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-}
-
-/* Highlight effect when dragging over a valid slot */
-.drag-over-highlight {
-    background-color: #e8f5e9; /* Light green highlight */
-    border-color: #4caf50;   /* Darker green border */
-    border-style: solid;
 }
 
 .slot-pemain .item-pemain {
@@ -647,6 +620,55 @@ input:focus, select:focus {
 }
 
 /* =====================================================================
+   MODAL STYLES (New)
+   ===================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.modal-content {
+    background-color: var(--light-color);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    width: 90%;
+    max-width: 400px;
+}
+#modal-player-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+#modal-player-list button {
+    background-color: var(--dark-color);
+    color: var(--light-color);
+    border: none;
+    padding: 12px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    font-weight: 500;
+}
+#modal-player-list button:hover {
+    background-color: #333;
+    transform: translateY(-1px);
+}
+#modal-close-button {
+    background-color: #6c757d; /* Muted gray for cancel */
+}
+
+
+/* =====================================================================
    RESPONSIVE & MOBILE ADJUSTMENTS
    ===================================================================== */
 @media (max-width: 480px) {
@@ -676,20 +698,16 @@ input:focus, select:focus {
     .tombol-pengaturan-klub { font-size: 1.2rem; }
     .menu-aksi-klub { width: 150px; top: 35px; }
 
-    /* PERBAIKAN TAMPILAN MATCH LEBIH KOMPAK */
+    /* REVISED: Keep match layout horizontal but make it more compact */
     .match-layout-container { 
-        flex-direction: column; 
-        gap: 0;
+        gap: 0.25rem; /* Reduce gap */
     }
     .kotak-pertandingan {
         padding: 0.8rem;
     }
-    .tim { 
-        width: 100%; 
-        text-align: center; 
-    }
     .vs-separator { 
-        margin: 0.5rem 0;
+        margin: 0;
+        padding: 0 0.25rem;
         font-size: 1.2rem;
     }
     .tim-kiri, .tim-kanan { 
@@ -697,20 +715,10 @@ input:focus, select:focus {
     }
 }
 
-/* PERUBAHAN DI SINI */
 .highlight-text {
     color: var(--primary-color);
 }
 
-/* Biar nama pemain tetap sejajar dan tidak loncat */
-.slot-pemain {
-    flex-direction: row; /* selalu sejajar horizontal */
-    gap: 4px;
-}
-
-/* Jika nama panjang, tetap terpotong dan tidak bikin turun */
-
-/* Wadah untuk semua tombol aksi, diposisikan di kanan atas */
 .match-actions {
     position: absolute;
     top: 10px;
@@ -721,7 +729,6 @@ input:focus, select:focus {
     z-index: 10;
 }
 
-/* Gaya dasar untuk TOMBOL IKON (Hapus & Edit) */
 .match-action-btn {
     background: transparent;
     border: none;
@@ -737,5 +744,3 @@ input:focus, select:focus {
     color: var(--text-muted);
     transition: all 0.2s ease-in-out;
 }
-
-
