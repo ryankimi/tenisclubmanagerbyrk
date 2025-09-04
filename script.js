@@ -11,6 +11,7 @@ const JSONBIN_API_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 let tennisAppClubs = [];
 let activeClubId = null;
 let activeDayId = null;
+let activePlayerSlot = null; // NEW: To track which slot was clicked
 
 // Pages
 const semuaHalaman = document.querySelectorAll('.page');
@@ -50,6 +51,12 @@ const kembaliDariKlasemen = document.getElementById('kembali-dari-klasemen');
 const displayNamaKlubDiKlasemen = document.getElementById('display-nama-klub-di-klasemen');
 const containerKlasemenUmum = document.getElementById('container-klasemen-umum');
 const tombolShareKlasemen = document.getElementById('tombol-share-klasemen');
+
+// NEW: Modal Elements
+const playerSelectionModal = document.getElementById('player-selection-modal');
+const modalPlayerList = document.getElementById('modal-player-list');
+const modalCloseButton = document.getElementById('modal-close-button');
+
 
 // =====================================================================
 // API FUNCTIONS
@@ -116,46 +123,74 @@ async function initializeApp() {
 }
 
 // =====================================================================
-// DRAG-AND-DROP LOGIC & HELPERS
+// CLICK-TO-ADD LOGIC (REPLACES DRAG-AND-DROP)
 // =====================================================================
-daftarPemain.addEventListener('dragstart', (event) => {
-    if (event.target.classList.contains('item-pemain')) {
-        event.dataTransfer.setData('text/plain', event.target.textContent);
+
+// Open the modal and show available players
+function showPlayerSelection(slotElement) {
+    if (slotElement.children.length > 0) return; // Don't open if a player is already there
+    activePlayerSlot = slotElement;
+    
+    const allPlayers = Array.from(daftarPemain.querySelectorAll('.item-pemain')).map(p => p.textContent);
+    
+    // Find players already in the current match
+    const matchBox = slotElement.closest('.kotak-pertandingan');
+    const playersInMatch = Array.from(matchBox.querySelectorAll('.item-pemain')).map(p => p.textContent);
+    
+    // Filter out players who are already in the match
+    const availablePlayers = allPlayers.filter(p => !playersInMatch.includes(p));
+    
+    modalPlayerList.innerHTML = ''; // Clear previous list
+    
+    if (availablePlayers.length > 0) {
+        availablePlayers.forEach(playerName => {
+            const button = document.createElement('button');
+            button.textContent = playerName;
+            button.onclick = () => addPlayerToSlot(playerName);
+            modalPlayerList.appendChild(button);
+        });
+    } else {
+        modalPlayerList.innerHTML = '<p>No other players available.</p>';
+    }
+    
+    playerSelectionModal.classList.remove('hidden');
+}
+
+// Add the selected player to the clicked slot
+function addPlayerToSlot(playerName) {
+    if (!activePlayerSlot) return;
+
+    activePlayerSlot.innerHTML = ''; // Clear any existing content (like placeholder)
+    
+    const playerDiv = document.createElement('div');
+    playerDiv.textContent = playerName;
+    playerDiv.className = 'item-pemain';
+    
+    activePlayerSlot.appendChild(playerDiv);
+    
+    closePlayerSelectionModal();
+    pasangUlangEventListeners();
+    saveState();
+}
+
+// Close the modal
+function closePlayerSelectionModal() {
+    playerSelectionModal.classList.add('hidden');
+    activePlayerSlot = null;
+}
+
+// Add event listeners for the modal
+modalCloseButton.addEventListener('click', closePlayerSelectionModal);
+playerSelectionModal.addEventListener('click', (event) => {
+    if (event.target === playerSelectionModal) {
+        closePlayerSelectionModal();
     }
 });
 
-function allowDrop(event) { event.preventDefault(); }
 
-function handleDragEnter(event) {
-    const targetSlot = event.target.closest('.slot-pemain');
-    if (targetSlot) {
-        targetSlot.classList.add('drag-over-highlight');
-    }
-}
-
-function handleDragLeave(event) {
-    const targetSlot = event.target.closest('.slot-pemain');
-    if (targetSlot) {
-        targetSlot.classList.remove('drag-over-highlight');
-    }
-}
-
-function drop(event) {
-    event.preventDefault();
-    const targetSlot = event.target.closest('.slot-pemain');
-    if (targetSlot) {
-        targetSlot.classList.remove('drag-over-highlight');
-        const namaPemain = event.dataTransfer.getData('text/plain');
-        if (namaPemain && targetSlot.children.length === 0) {
-            const elemenBaruDiSlot = document.createElement('div');
-            elemenBaruDiSlot.textContent = namaPemain;
-            elemenBaruDiSlot.className = 'item-pemain';
-            targetSlot.appendChild(elemenBaruDiSlot);
-            pasangUlangEventListeners();
-        }
-    }
-}
-
+// =====================================================================
+// HELPER FUNCTIONS
+// =====================================================================
 function getActiveClub() { return tennisAppClubs.find(c => c.clubId === activeClubId); }
 function getActiveDay() {
     const club = getActiveClub();
@@ -167,24 +202,28 @@ function createPlayerElement(playerName) {
     pemainBaru.textContent = playerName;
     pemainBaru.className = 'item-pemain';
     pemainBaru.addEventListener('click', function() { this.remove(); saveState(); });
-    pemainBaru.draggable = true;
+    // pemainBaru.draggable = true; // REMOVED
     daftarPemain.appendChild(pemainBaru);
 }
 function pasangUlangEventListeners() {
+    // This function now also handles removing players from slots
     document.querySelectorAll('.slot-pemain .item-pemain').forEach(pemainDiSlot => {
-        if (pemainDiSlot.onclick && pemainDiSlot.onclick.toString().includes('this.remove()')) return; // Avoid re-attaching
+        if (pemainDiSlot.onclick && pemainDiSlot.onclick.toString().includes('this.remove()')) return;
         pemainDiSlot.onclick = function() {
             const matchBox = this.closest('.kotak-pertandingan');
-            if(!matchBox) { // If player is in the main player list
+            if(!matchBox) { 
                 this.remove(); 
                 saveState();
                 return;
             }
             const isFinished = wadahPertandinganSelesai.contains(matchBox);
             const isBeingEdited = matchBox.querySelector('.tombol-save-match');
-            if (!isFinished || isBeingEdited) { this.remove(); }
+            if (!isFinished || isBeingEdited) { 
+                this.parentElement.innerHTML = ''; // Empty the slot instead of just removing the item
+            }
         };
     });
+    
     document.querySelectorAll('.kotak-pertandingan').forEach(matchBox => {
         const matchId = parseInt(matchBox.id.split('-')[1]);
         if (!matchId) return;
@@ -269,7 +308,6 @@ function toggleMenuAksi(event, clubId) {
     const currentMenu = document.getElementById(`menu-aksi-${clubId}`);
     const currentContainer = currentMenu.closest('.klub-item-container');
 
-    // Close other menus and reset their container's z-index
     document.querySelectorAll('.menu-aksi-klub').forEach(menu => {
         if (menu.id !== `menu-aksi-${clubId}`) {
             menu.style.display = 'none';
@@ -278,13 +316,12 @@ function toggleMenuAksi(event, clubId) {
         }
     });
 
-    // Toggle the current menu and its container's z-index
     if (currentMenu.style.display === 'block') {
         currentMenu.style.display = 'none';
         if (currentContainer) currentContainer.style.zIndex = 'auto';
     } else {
         currentMenu.style.display = 'block';
-        if (currentContainer) currentContainer.style.zIndex = '100'; // High value to ensure it's on top
+        if (currentContainer) currentContainer.style.zIndex = '100';
     }
 }
 
@@ -512,36 +549,7 @@ function tambahMatchBaru() {
     saveState();
 }
 
-/**
- * KODE INI DIPERBAIKI UNTUK MENGATASI BUG TOMBOL SAVE
- * Helper function to ensure the action buttons wrapper exists in a match header.
- * This handles old data that might not have the wrapper.
- * @param {HTMLElement} matchHeader - The .match-header element.
- * @returns {HTMLElement} - The .match-actions-wrapper element.
- */
-function ensureActionsWrapper(matchHeader) {
-    let actionsWrapper = matchHeader.querySelector('.match-actions-wrapper');
-    if (!actionsWrapper) {
-        actionsWrapper = document.createElement('div');
-        actionsWrapper.className = 'match-actions-wrapper';
-        
-        // MIGRASI: Cari tombol-tombol aksi lama yang mungkin ada di luar wrapper
-        const oldDeleteBtn = matchHeader.querySelector('.tombol-hapus-match');
-        if (oldDeleteBtn && oldDeleteBtn.parentElement === matchHeader) {
-            actionsWrapper.appendChild(oldDeleteBtn);
-        }
-        const oldEditBtn = matchHeader.querySelector('.tombol-edit-match');
-        if (oldEditBtn && oldEditBtn.parentElement === matchHeader) {
-            actionsWrapper.appendChild(oldEditBtn);
-        }
-        
-        matchHeader.appendChild(actionsWrapper);
-    }
-    return actionsWrapper;
-}
-
 function gambarPertandingan(matchId, matchNum, tipe) {
-    // Menambahkan div khusus untuk tombol aksi (edit, save, hapus)
     const actionsHTML = `
     <div class="match-actions">
         <button class="match-action-btn tombol-hapus-match" onclick="hapusMatch(${matchId})">&times;</button>
@@ -549,7 +557,8 @@ function gambarPertandingan(matchId, matchNum, tipe) {
 `;
 
     let htmlPertandingan = '';
-    const slotAttrs = `class="slot-pemain" ondragover="allowDrop(event)" ondrop="drop(event)"`;
+    // REVISED: Replaced drag-drop attributes with a simple onclick
+    const slotAttrs = `class="slot-pemain" onclick="showPlayerSelection(this)"`;
     const inputType = `type="number" class="input-skor" placeholder="Skor"`;
 
     if (tipe === 'single') {
@@ -594,7 +603,6 @@ function selesaiMatch(matchId) {
     const day = getActiveDay(); if (!day) return;
     const matchBox = document.getElementById(`match-${matchId}`);
     
-    // Validasi
     const semuaPemain = matchBox.querySelectorAll('.slot-pemain .item-pemain');
     const semuaSkor = matchBox.querySelectorAll('.input-skor');
     if (semuaSkor[0].value.trim() === '' || semuaSkor[1].value.trim() === '') {
@@ -605,7 +613,6 @@ function selesaiMatch(matchId) {
         return alert('Lengkapi semua pemain di slot pertandingan!');
     }
 
-    // Proses data
     const tim = matchBox.querySelectorAll('.tim');
     const pemainTim1 = Array.from(tim[0].querySelectorAll('.item-pemain')).map(p => p.textContent).join(' & ');
     const pemainTim2 = Array.from(tim[1].querySelectorAll('.item-pemain')).map(p => p.textContent).join(' & ');
@@ -618,7 +625,6 @@ function selesaiMatch(matchId) {
     matchBox.querySelector('.tombol-selesai-match').remove();
     semuaSkor.forEach(input => input.disabled = true);
     
-    // BUAT TOMBOL EDIT
     const actionContainer = matchBox.querySelector('.match-actions');
     const tombolEdit = document.createElement('button');
     tombolEdit.innerHTML = '&#9998;';
@@ -629,8 +635,6 @@ function selesaiMatch(matchId) {
     saveState();
 }
 
-
-// === FUNGSI DIPERBAIKI DI SINI ===
 function editMatch(matchId) {
     const matchBox = document.getElementById(`match-${matchId}`);
     const skorInputs = matchBox.querySelectorAll('.input-skor');
@@ -639,7 +643,6 @@ function editMatch(matchId) {
         input.style.border = "2px solid var(--primary-color)";
     });
     
-    // HAPUS TOMBOL EDIT, BUAT TOMBOL SAVE
     const actionContainer = matchBox.querySelector('.match-actions');
     actionContainer.querySelector('.tombol-edit-match').remove();
     
@@ -648,9 +651,13 @@ function editMatch(matchId) {
     tombolSave.className = 'tombol-save-match';
     tombolSave.onclick = () => saveMatch(matchId);
     actionContainer.appendChild(tombolSave);
+
+    // Make players removable again
+    matchBox.querySelectorAll('.slot-pemain').forEach(slot => {
+        slot.classList.add('editable');
+    });
 }
 
-// === FUNGSI DIPERBAIKI DI SINI ===
 function saveMatch(matchId) {
     const day = getActiveDay(); if (!day) return;
     const matchBox = document.getElementById(`match-${matchId}`);
@@ -671,13 +678,12 @@ function saveMatch(matchId) {
         input.style.border = "1px solid var(--border-color)";
     });
     
-    // HAPUS TOMBOL SAVE, BUAT KEMBALI TOMBOL EDIT
     const actionContainer = matchBox.querySelector('.match-actions');
     actionContainer.querySelector('.tombol-save-match').remove();
     
     const tombolEdit = document.createElement('button');
     tombolEdit.innerHTML = '&#9998;';
-    tombolEdit.className = 'tombol-edit-match';
+    tombolEdit.className = 'match-action-btn tombol-edit-match';
     tombolEdit.onclick = () => editMatch(matchId);
     actionContainer.appendChild(tombolEdit);
     
