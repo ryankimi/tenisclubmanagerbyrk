@@ -15,7 +15,6 @@
     
     <div id="halaman-daftar-klub" class="page">
         <h1>TENNIS CLUB <span class="highlight-text">MANAGER</span></h1>
-        
         <p class="subtitle">by RK</p>
         <h3>CLUB LIST</h3>
         <div id="container-daftar-klub"></div>
@@ -48,7 +47,7 @@
                         <input id="input-nama-pemain" type="text" placeholder="Enter player name">
                         <button id="tombol-tambah-pemain">Add</button>
                     </div>
-                    <h4>Player List <span class="instruction">(drag player to a match slot)</span></h4>
+                    <h4>Player List</h4>
                     <div id="daftar-pemain" class="kotak-daftar-pemain"></div>
                 </div>
                 <div class="pertandingan-section">
@@ -78,8 +77,17 @@
         <div id="container-klasemen-umum"></div>
     </div>
 
-    <script src="script.js"></script>
+    <div id="player-selection-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Select Player</h3>
+            <div id="modal-player-list">
+                </div>
+            <button id="modal-close-button" class="tombol-utama">Cancel</button>
+        </div>
+    </div>
 
+
+    <script src="script.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
