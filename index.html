@@ -77,11 +77,49 @@
         <div id="container-klasemen-umum"></div>
     </div>
 
+    <div id="halaman-stats-pemain" class="page hidden">
+        <button class="tombol-kembali" id="kembali-dari-stats-pemain">&larr; Back to Standings</button>
+        <h2>PLAYER STATS</h2>
+        
+        <div id="container-stats-pemain" class="stats-bg-white">
+            <div class="stats-header">
+                <h1 id="stats-nama-pemain">PLAYER NAME</h1>
+                <p id="stats-konteks">STATS WITH CLUB NAME (OVERALL)</p>
+            </div>
+            <div class="stats-body">
+                <div class="stat-item">
+                    <p class="stat-label">SETS PLAYED</p>
+                    <p id="stats-set-dimainkan-value" class="stat-value">0</p>
+                </div>
+                <div class="stat-item">
+                    <p class="stat-label">SETS WON</p>
+                    <p id="stats-set-menang-value" class="stat-value">0</p>
+                </div>
+                <div class="stat-item">
+                    <p class="stat-label">WIN PERCENTAGE</p>
+                    <p id="stats-win-rate-value" class="stat-value">0.0%</p>
+                </div>
+            </div>
+            <div class="stats-footer">
+                <p>TENNIS CLUB <span class="highlight-text">MANAGER</span></p>
+            </div>
+        </div>
+
+        <div class="stats-controls">
+            <h3>Image Options</h3>
+            <div class="button-group">
+                <button id="tombol-bg-putih">White BG</button>
+                <button id="tombol-bg-transparan">Transparent BG</button>
+            </div>
+            <button id="tombol-save-story" class="tombol-utama">Save as Story</button>
+        </div>
+    </div>
+
+
     <div id="player-selection-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3>Select Player</h3>
-            <div id="modal-player-list">
-                </div>
+            <div id="modal-player-list"></div>
             <button id="modal-close-button" class="tombol-utama">Cancel</button>
         </div>
     </div>
