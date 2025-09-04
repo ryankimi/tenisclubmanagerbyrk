@@ -1,23 +1,16 @@
 /* =====================================================================
-   GLOBAL STYLES & VARIABLES
+   GLOBAL STYLES & VARIABLES (Sesuai Desain Final)
    ===================================================================== */
 :root {
-    --primary-color: #007BFF;
-    --primary-hover: #0056b3;
-    --secondary-color: #6c757d;
-    --success-color: #28a745;
-    --danger-color: #dc3545;
-    --warning-color: #ffc107;
-    --info-color: #17a2b8;
-    --light-color: #f8f9fa;
-    --dark-color: #343a40;
-    --background-color: #f0f2f5;
-    --surface-color: #ffffff;
-    --border-color: #dee2e6;
-    --text-color: #212529;
+    --primary-color: #3c6d55;          /* RAL 6000 - Patina Green */
+    --primary-hover: #315946;          /* Versi lebih gelap untuk hover */
+    --dark-color: #000000;             /* Warna utama: Hitam */
+    --light-color: #FFFFFF;            /* Warna terang: Putih */
+    --border-color: #EAEAEA;           /* Border abu-abu sangat terang */
+    --text-color: #000000;
     --text-muted: #6c757d;
+    --danger-color: #dc3545;
     --font-family: 'Poppins', sans-serif;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
     --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
     --border-radius: 8px;
 }
@@ -25,505 +18,724 @@
 body {
     font-family: var(--font-family);
     text-align: center;
-    background-color: var(--background-color);
+    background-color: var(--light-color); /* Latar belakang putih */
     color: var(--text-color);
     margin: 0;
     padding: 2rem 1rem;
 }
 
 .page { 
-    max-width: 850px; 
+    max-width: 480px; /* Layout lebih sempit agar fokus di tengah */
     margin: auto; 
-    background-color: var(--surface-color); 
-    padding: 2rem; 
-    border-radius: var(--border-radius); 
-    box-shadow: var(--shadow-md);
+    background-color: var(--light-color); 
+    padding: 2rem 1rem; 
+    box-shadow: none;
     position: relative;
-    padding-top: 4rem;
+    padding-top: 2rem;
 }
 .hidden { display: none !important; }
 
 h1, h2, h3, h4 {
     color: var(--dark-color);
-    font-weight: 600;
+    font-weight: 700;
+    text-transform: uppercase;
 }
-h1 { margin-bottom: 0.5rem; }
-h2 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+h1 { 
+    margin-bottom: 0.25rem; 
+    font-size: 2.2rem;
+    letter-spacing: 1.5px;
+}
+h2 { 
+    margin-top: 0; 
+    border-bottom: 2px solid var(--dark-color); 
+    padding-bottom: 1rem; 
+    margin-bottom: 1.5rem; 
+}
+h3 { 
+    font-size: 1rem; 
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+}
 
 .subtitle {
     margin-top: 0;
-    margin-bottom: 2rem;
-    font-style: italic;
-    color: var(--text-muted);
-    font-size: 1rem;
+    margin-bottom: 3rem;
+    font-style: normal;
+    color: var(--text-color);
+    font-size: 0.9rem;
     font-weight: 400;
+    text-transform: uppercase;
 }
 
 /* =====================================================================
    BUTTONS & INPUTS
    ===================================================================== */
 button {
-    padding: 12px 20px;
-    font-size: 1rem;
-    font-family: var(--font-family);
-    font-weight: 500;
     cursor: pointer;
-    border-radius: var(--border-radius);
-    border: none;
-    margin: 5px;
     transition: all 0.2s ease-in-out;
+    font-family: var(--font-family);
 }
 button:hover {
+    opacity: 0.9;
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
 }
-button:active {
-    transform: translateY(0);
-    box-shadow: var(--shadow-sm);
-}
-.tombol-utama { background-color: var(--primary-color); color: white; }
-.tombol-utama:hover { background-color: var(--primary-hover); }
-.tombol-bahaya { background-color: var(--danger-color); color: white; }
-.tombol-lihat-klasemen { background-color: var(--info-color); color: white; }
-#tombol-tambah-match { background-color: var(--success-color); color: white; }
 
-input[type="text"], input[type="password"], select {
-    display: block;
-    margin: 15px auto;
-    padding: 12px;
-    font-size: 1rem;
-    font-family: var(--font-family);
-    width: 90%;
-    max-width: 400px;
-    border: 1px solid var(--border-color);
+.tombol-utama { 
+    background-color: var(--primary-color); 
+    color: var(--light-color);
+    border: none;
     border-radius: var(--border-radius);
-    transition: border-color 0.2s, box-shadow 0.2s;
+    padding: 14px 28px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 1rem 0;
 }
-input[type="text"]:focus, input[type="password"]:focus, select:focus {
+.tombol-utama:hover {
+    background-color: var(--primary-hover);
+}
+
+
+/* General input styling */
+input[type="text"], input[type="number"], select {
+    width: 100%;
+    padding: 10px;
+    margin: 0.5rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: var(--font-family);
+    font-size: 1rem;
+}
+input:focus, select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    box-shadow: 0 0 0 2px rgba(60, 109, 85, 0.2); /* Adjusted shadow color for green */
 }
 
+
+/* =====================================================================
+   LAYOUT ADJUSTMENTS FOR SPACING
+   ===================================================================== */
 .tombol-kembali { 
+    all: unset; /* Reset all default button styles */
+    cursor: pointer; 
     position: absolute; 
     top: 20px; 
     left: 20px; 
-    background-color: var(--secondary-color); 
-    color: white; 
-    margin: 0;
-    padding: 8px 15px;
+    font-weight: 600; 
+    color: var(--dark-color);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 5px 10px;
+    border-radius: var(--border-radius);
 }
-#tombol-logout { position: absolute; top: 20px; right: 20px; margin: 0; }
-#tombol-reset-total { position: absolute; top: 20px; right: 100px; margin: 0; }
+.tombol-kembali:hover {
+    background-color: #f0f0f0;
+}
+
+/* Adjust top margin for elements immediately after .tombol-kembali to push them down */
+#halaman-daftar-hari h2,
+#halaman-utama h2,
+#halaman-klasemen-umum h2 {
+    margin-top: 3.5rem; /* More space from the back button */
+}
 
 
 /* =====================================================================
-   AUTHENTICATION PAGE
+   CLUB LIST (Sesuai Desain Final)
    ===================================================================== */
-#halaman-autentikasi { padding-top: 2rem; }
-#halaman-autentikasi h1 { font-size: 2.5rem; font-weight: 700; }
-#konten-autentikasi { width: 90%; max-width: 400px; margin: auto; }
-#konten-autentikasi p { margin-top: 1.5rem; font-size: 0.9rem; }
-#konten-autentikasi a { color: var(--primary-color); text-decoration: none; font-weight: 500; cursor: pointer; }
-#konten-autentikasi a:hover { text-decoration: underline; }
-
-/* =====================================================================
-   CLUB & DAY LIST (CARD STYLES)
-   ===================================================================== */
-#container-daftar-klub, #container-daftar-hari {
+#container-daftar-klub {
     margin: 2rem 0;
     display: grid;
     gap: 1rem;
+    grid-template-columns: 1fr;
 }
-#container-daftar-klub { grid-template-columns: 1fr; }
-#container-daftar-hari { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
 .klub-item-container {
+    position: relative;
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1.5rem;
-    border: 1px solid var(--border-color);
+    padding: 1.5rem;
     border-radius: var(--border-radius);
     transition: all 0.2s ease-in-out;
+    background-color: var(--dark-color); /* Latar belakang hitam */
+    color: var(--light-color); /* Teks putih */
 }
 .klub-item-container:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-md);
-    border-left: 5px solid var(--primary-color);
 }
-.nama-klub-item { font-size: 1.25rem; font-weight: 600; text-align: left; }
-.klub-item-actions button { font-size: 0.9rem; padding: 5px 10px; }
-.tombol-buka-klub { background-color: var(--success-color); color: white; }
-.hari-item-container {
-    display: flex;
-    align-items: stretch;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    transition: all 0.2s ease-in-out;
-}
-.hari-item-container:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
-}
-.tombol-hari {
-    padding: 1.5rem 1rem;
+
+.nama-klub-item {
     font-size: 1.1rem;
     font-weight: 600;
-    background-color: #fdfdfd;
-    flex-grow: 1;
-    border: none;
     text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--light-color);
+}
+
+.tombol-pengaturan-klub {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    background-color: transparent;
+    color: var(--light-color);
+    font-size: 1.5rem;
+    padding: 5px;
+    margin: 0;
+    border: none;
+    line-height: 1;
+    z-index: 10;
+}
+.tombol-pengaturan-klub:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-50%);
+    box-shadow: none;
+}
+
+.menu-aksi-klub {
+    display: none;
+    position: absolute;
+    top: 45px;
+    right: 10px;
+    background-color: var(--light-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    z-index: 20;
+    width: 180px;
+    padding: 0.5rem 0;
+}
+.menu-aksi-klub a {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--dark-color);
+    text-decoration: none;
+    text-align: left;
+}
+.menu-aksi-klub a:hover {
+    background-color: #f0f0f0;
+}
+.menu-aksi-hapus {
+    color: var(--danger-color) !important;
+}
+
+/* =====================================================================
+   DAY LIST
+   ===================================================================== */
+#container-daftar-hari {
+    margin: 2rem 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+}
+
+.hari-item-container {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    background-color: #f8f9fa; /* Light background for day items */
+    border: 1px solid var(--border-color);
+}
+
+.hari-item-content {
+    flex-grow: 1;
+    text-align: left;
+    padding-right: 1rem; /* Space between name and buttons */
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 500;
     color: var(--dark-color);
 }
-.tombol-hari:hover { background-color: #f0f0f0; }
-.tombol-hapus-hari, .tombol-rename-hari {
-    background-color: #fdfdfd;
-    border: none;
-    border-left: 1px solid var(--border-color);
-    font-size: 1.25rem;
-    padding: 0 1rem;
+.hari-item-content:hover .nama-hari {
+    color: var(--primary-color);
+}
+
+
+.hari-action-buttons {
+    display: flex;
+    gap: 0.5rem; /* Space between rename and delete buttons */
+}
+
+.tombol-rename-hari, .tombol-hapus-hari {
+    all: unset; /* Reset button styles */
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 5px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.tombol-rename-hari {
     color: var(--text-muted);
 }
-.tombol-hapus-hari:hover { background-color: var(--danger-color); color: white; }
-.tombol-rename-hari:hover { background-color: var(--warning-color); color: white; }
+.tombol-rename-hari:hover {
+    color: var(--primary-color);
+    background-color: rgba(60, 109, 85, 0.1);
+}
+
+.tombol-hapus-hari {
+    color: var(--text-muted);
+}
+.tombol-hapus-hari:hover {
+    color: var(--danger-color);
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
 
 /* =====================================================================
    MAIN SETUP PAGE
    ===================================================================== */
 .section-card {
-    background: #fafafa;
+    background-color: #f8f9fa;
     border: 1px solid var(--border-color);
-    padding: 1.5rem;
     border-radius: var(--border-radius);
-    margin-top: 2rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
 }
+
 .input-group {
     display: flex;
     gap: 0.5rem;
-    align-items: center;
     margin-bottom: 1rem;
 }
-.input-group input { flex-grow: 1; margin: 0; }
-.input-group button { margin: 0; flex-shrink: 0; }
-.instruction { font-size: 0.8rem; color: var(--text-muted); font-weight: 400; }
-
-.kotak-daftar-pemain {
-    border: 2px dashed var(--border-color);
-    width: 100%;
-    min-height: 100px;
-    margin: 1rem auto;
-    padding: 10px;
-    border-radius: var(--border-radius);
-    background-color: var(--surface-color);
+.input-group input {
+    flex-grow: 1;
 }
-.item-pemain {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 8px 15px;
-    margin: 5px;
-    border-radius: 20px;
-    display: inline-block;
-    cursor: grab;
-    transition: all 0.2s;
+.input-group button {
+    background-color: var(--dark-color);
+    color: var(--light-color);
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 10px 15px;
     font-weight: 500;
+    font-size: 0.9rem;
+}
+.input-group button:hover {
+    background-color: #333;
+    transform: translateY(-1px);
+}
+
+.kotak-daftar-pemain { 
+    border: 2px dashed var(--border-color); 
+    min-height: 100px;  /* Tinggi minimum tidak terlalu besar */
+    padding: 10px; 
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 5px;
+    border-radius: var(--border-radius);
+    background-color: var(--light-color);
+}
+
+.item-pemain { 
+    padding: 4px 8px; /* Padding sangat dikecilkan */
+    font-size: 0.7rem; /* Font sangat dikecilkan */
+    display: inline-block;
+    max-width: 150px;      /* Batasi lebar maksimum nama */
+    white-space: nowrap;   /* Cegah teks turun ke bawah */
+    overflow: hidden;      /* Sembunyikan teks yang meluber */
+    text-overflow: ellipsis; /* Tampilkan "..." untuk teks yang terpotong */
+    vertical-align: middle;
 }
 .item-pemain:hover {
-    background-color: var(--danger-color);
-    text-decoration: line-through;
-    cursor: pointer;
+    background-color: var(--primary-hover);
 }
-#pilihan-tipe-pertandingan { margin: 2rem 0; }
-.tombol-pilihan {
-    padding: 1rem 2rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-    background-color: var(--light-color);
-    border: 2px solid var(--primary-color);
-    color: var(--primary-color);
-}
-.tombol-pilihan:hover {
-    background-color: var(--primary-color);
-    color: white;
+.item-pemain:active {
+    cursor: grabbing;
 }
 
-/* =====================================================================
-   MATCH BOX STYLES
-   ===================================================================== */
-.pertandingan-section { margin-top: 2rem; }
-.kotak-pertandingan {
-    position: relative;
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-left: 5px solid var(--info-color);
-    padding: 1.5rem;
-    padding-top: 3rem;
-    margin: 1.5rem auto;
-    width: 100%;
-    max-width: 700px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
+
+/* Match Type Selection */
+#pilihan-tipe-pertandingan h3 {
+    margin-bottom: 1.5rem;
 }
-.judul-match {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: var(--info-color);
-    color: white;
-    padding: 5px 15px;
-    border-radius: var(--border-radius) 0 var(--border-radius) 0;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-.match-layout-container { display: flex; justify-content: space-around; align-items: center; gap: 1rem; }
-.vs-separator { 
-    font-weight: 700; 
-    font-size: 2rem; 
-    color: var(--text-muted);
-}
-.tim {
-    flex: 1;
-    padding: 1.5rem 1rem;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-    position: relative;
-    padding-top: 3rem;
-}
-.tim::before {
-    content: '';
-    position: absolute;
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 1px;
-}
-.tim-kiri::before { content: 'TEAM 1'; }
-.tim-kanan::before { content: 'TEAM 2'; }
-.tim-kiri { background-color: #f0f6ff; }
-.tim-kanan { background-color: #fff2f0; }
-.tim-slot { display: flex; flex-direction: column; justify-content: center; gap: 10px; }
-.slot-pemain {
-    border: 2px dashed var(--border-color);
-    height: 45px;
-    margin: 5px auto;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: var(--border-radius);
-    transition: background-color 0.2s, border-color 0.2s;
-    position: relative;
+#pilihan-tipe-pertandingan button {
     background-color: var(--light-color);
+    color: var(--dark-color);
+    border: 2px solid var(--dark-color);
+    padding: 1.2rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0.5rem;
+    border-radius: var(--border-radius);
 }
-.slot-pemain:empty::before {
-    content: "Drag player here";
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    font-style: italic;
-    pointer-events: none;
+#pilihan-tipe-pertandingan button:hover {
+    background-color: var(--dark-color);
+    color: var(--light-color);
+    transform: translateY(-2px);
 }
-.slot-pemain:hover {
-    background-color: #e9f3ff;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+
+/* Match Box Styling */
+.pertandingan-section h3 {
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
 }
-.slot-pemain .item-pemain { cursor: pointer; background-color: var(--dark-color); }
-.slot-pemain .item-pemain:hover { background-color: var(--danger-color); text-decoration: line-through; }
-.kolom-skor { margin-top: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 10px; }
-.input-skor { width: 100px; text-align: center; display: inline-block; margin: 0; }
-.tombol-selesai-match { background-color: var(--warning-color); color: black; border: none; margin-top: 1.5rem; width: 100%; }
-.pemisah-match { margin: 3rem auto; border: 0; border-top: 1px solid var(--border-color); }
-#wadah-pertandingan-selesai .kotak-pertandingan {
-    border-left: 5px solid var(--secondary-color);
-    background-color: #fdfdfd;
+
+.kotak-pertandingan {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: relative; /* For action buttons positioning */
 }
-#wadah-pertandingan-selesai .kotak-pertandingan .judul-match {
-    background-color: var(--secondary-color);
+
+.match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline; /* Sejajarkan baseline teks dan tombol */
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed var(--border-color);
+    gap: 1rem; 
 }
-#wadah-pertandingan-selesai .kotak-pertandingan .item-pemain {
-    background-color: var(--secondary-color);
+
+.judul-match {
+    flex-grow: 1; 
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
-#wadah-pertandingan-selesai .kotak-pertandingan, #wadah-pertandingan-selesai .input-skor {
-    opacity: 0.7;
+
+.match-actions-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem; 
+    flex-shrink: 0; 
 }
-.tombol-edit-match, .tombol-save-match, .tombol-hapus-match {
-    position: absolute;
-    top: 10px;
-    z-index: 10;
-    transition: all 0.2s ease-in-out;
+
+.match-action-btn {
+    background-color: transparent;
+    border: none;
+    font-size: 1.1rem;
+    padding: 5px;
+    margin: 0; /* Margin is handled by the wrapper's gap */
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    color: var(--text-muted); /* Default for action buttons */
 }
-.tombol-edit-match:hover, .tombol-save-match:hover, .tombol-hapus-match:hover {
-    box-shadow: var(--shadow-sm);
+.match-action-btn:hover {
+    background-color: #eee;
     transform: translateY(-1px);
 }
 .tombol-hapus-match {
-    right: 10px;
     background-color: transparent;
     color: var(--text-muted);
     font-size: 1.5rem;
-    padding: 0 5px;
     line-height: 1;
 }
 .tombol-hapus-match:hover {
     color: var(--danger-color);
-    background-color: rgba(220, 53, 69, 0.1);
 }
+.match-actions button {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.match-actions button:hover {
+    transform: translateY(-1px);
+}
+
+/* Tombol Hapus (Ikon 'x') */
+.tombol-hapus-match {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+.tombol-hapus-match:hover {
+    color: var(--danger-color);
+    background-color: rgba(220, 53, 69, 0.1); /* Latar merah samar saat disentuh */
+}
+
+/* Tombol Edit (Ikon 'pensil') */
 .tombol-edit-match {
-    right: 50px;
-    background-color: var(--info-color);
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    font-size: 0.8rem;
+    font-size: 1.1rem;
 }
-.tombol-save-match {
-    right: 50px;
-    background-color: var(--success-color);
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    font-size: 0.8rem;
+.tombol-edit-match:hover {
+    color: var(--primary-color);
+    background-color: rgba(60, 109, 85, 0.1); /* Latar hijau samar saat disentuh */
 }
+
+
+
+
+.tombol-selesai-match {
+    background-color: var(--primary-color);
+    color: var(--light-color);
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 10px 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    width: 100%;
+    margin-top: 1rem;
+    text-transform: uppercase;
+}
+.tombol-selesai-match:hover {
+    background-color: var(--primary-hover);
+}
+
+
+.match-layout-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap; 
+}
+
+.tim {
+    flex: 1;
+    min-width: 0; /* PENTING: Membiarkan kotak menyusut di bawah lebar kontennya */
+}
+
+.tim-kiri { text-align: right; }
+.tim-kanan { text-align: left; }
+
+.vs-separator {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    padding: 0 0.5rem;
+}
+
+/* === PERBAIKAN DI SINI === */
+.slot-pemain {
+    border: 2px dashed #dcdcdc;
+    min-height: 40px; /* Tinggi minimum dikurangi */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px 0;
+    padding: 4px; /* Padding dikurangi */
+    border-radius: var(--border-radius);
+    background-color: #f9f9f9;
+    /* ... properti lainnya ... */
+}
+
+/* Placeholder text for empty slots */
+.slot-pemain:empty::before {
+    content: 'Drag Player Here';
+    color: #b0b0b0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Highlight effect when dragging over a valid slot */
+.drag-over-highlight {
+    background-color: #e8f5e9; /* Light green highlight */
+    border-color: #4caf50;   /* Darker green border */
+    border-style: solid;
+}
+
+.slot-pemain .item-pemain {
+    margin: 0; /* Override default margin */
+}
+
+.tim-slot {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Space between player slots in double mode */
+}
+
+.kolom-skor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+.kolom-skor input {
+    width: 60px; /* Fixed width for score inputs */
+    text-align: center;
+    padding: 8px;
+    margin: 0; /* Override default margin */
+}
+.kolom-skor span {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--dark-color);
+}
+
+.pemisah-match {
+    border: none;
+    border-top: 2px dashed var(--border-color);
+    margin: 3rem 0;
+}
+
 
 /* =====================================================================
    STANDINGS PAGE
    ===================================================================== */
 .filter-klasemen {
-    margin: 1rem 0 2rem 0;
+    margin: 2rem 0;
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* Stack label and select */
     align-items: center;
     gap: 0.5rem;
 }
 .filter-klasemen label {
     font-weight: 500;
-}
-#filter-hari {
-    display: inline-block;
-    width: auto;
-    margin: 0;
-    padding: 10px 15px;
-}
-#container-klasemen-umum { overflow-x: auto; }
-#container-klasemen-umum table { margin: 0 auto 2rem auto; width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-#container-klasemen-umum th, #container-klasemen-umum td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-}
-#container-klasemen-umum th {
-    background-color: var(--light-color);
-    font-weight: 600;
     color: var(--dark-color);
 }
-#container-klasemen-umum tr:last-child td { border-bottom: none; }
-#container-klasemen-umum tr:nth-of-type(even) { background-color: #fcfcfc; }
-#container-klasemen-umum tr:hover { background-color: #f1f1f1; }
+.filter-klasemen select {
+    width: 100%;
+    max-width: 250px; /* Limit width of dropdown */
+    text-align: center;
+    padding: 8px;
+    border-radius: var(--border-radius);
+    background-color: var(--light-color);
+}
+
+#container-klasemen-umum {
+    margin-top: 2rem;
+    overflow-x: auto; /* Enable horizontal scrolling for tables on small screens */
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    background-color: var(--light-color);
+    padding: 0.5rem;
+}
 
 #container-klasemen-umum table { 
-    margin: 0 auto 2rem auto; 
     width: 100%; 
-    max-width: 600px; /* <--- TAMBAHKAN ATAU SESUAIKAN BARIS INI */
     border-collapse: collapse; 
-    font-size: 0.95rem; 
+    min-width: 400px; /* Ensure table is readable on small screens */
+}
+
+#container-klasemen-umum th, #container-klasemen-umum td { 
+    padding: 10px 12px; 
+    border-bottom: 1px solid var(--border-color); 
+    text-align: left; 
+    white-space: nowrap; /* Prevent text wrapping in table cells */
+    font-size: 0.9rem;
+}
+
+#container-klasemen-umum th { 
+    background-color: #f0f0f0; 
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-color);
+}
+#container-klasemen-umum tr:last-child td {
+    border-bottom: none;
+}
+#container-klasemen-umum tbody tr:hover {
+    background-color: #f8f8f8;
 }
 
 /* =====================================================================
-   TAMPILAN MATCH FINAL (Kompak, Kiri-Kanan, & Mobile Friendly)
+   RESPONSIVE & MOBILE ADJUSTMENTS
    ===================================================================== */
-
-/* Bagian 1: Membuat tampilan dasar menjadi minimalis di semua ukuran layar */
-.tim {
-    background-color: transparent; /* Hapus latar belakang team box */
-    border: none;                  /* Hapus bingkai team box */
-    padding: 0;                    /* Hapus padding team box */
-    flex: 1;                       /* Pastikan kedua sisi seimbang */
-    display: flex;
-    justify-content: center;
+@media (max-width: 480px) {
+    /* More Compact Standings Table */
+    #container-klasemen-umum table {
+        min-width: 0; /* Allow table to shrink fully */
+    }
+    #container-klasemen-umum th, #container-klasemen-umum td {
+        padding: 8px 4px; /* Reduce padding */
+        font-size: 0.8rem; /* Reduce font size */
+        white-space: normal; /* Allow text to wrap */
+        text-align: center; /* Center align for compact view */
+    }
+    #container-klasemen-umum th:nth-child(2),
+    #container-klasemen-umum td:nth-child(2) {
+        text-align: left; /* Keep player name left-aligned */
+        white-space: normal;
+    }
 }
 
-.tim::before {
-    display: none; /* Hapus tulisan "TEAM 1" & "TEAM 2" */
-}
+@media (max-width: 400px) {
+    h1 { font-size: 1.8rem; }
+    h2 { font-size: 1.5rem; }
+    .tombol-utama { padding: 12px 20px; font-size: 0.8rem; }
+    .klub-item-container, .hari-item-container { padding: 1rem; }
+    .nama-klub-item, .nama-hari { font-size: 1rem; }
+    .tombol-pengaturan-klub { font-size: 1.2rem; }
+    .menu-aksi-klub { width: 150px; top: 35px; }
 
-/* Mengatur agar slot pemain memiliki lebar yang pas */
-.tim-slot {
-    width: 100%;
-    max-width: 200px; /* Batasi lebar maksimum slot agar tidak terlalu besar di desktop */
-}
-
-
-/* Bagian 2: Penyesuaian agar tetap Kiri-Kanan & Ringkas di HP */
-@media (max-width: 768px) {
-    /* Perkecil padding utama kotak pertandingan */
+    /* PERBAIKAN TAMPILAN MATCH LEBIH KOMPAK */
+    .match-layout-container { 
+        flex-direction: column; 
+        gap: 0;
+    }
     .kotak-pertandingan {
-        padding: 1rem;
-        padding-top: 3rem; /* Sisakan ruang untuk tombol hapus/edit */
+        padding: 0.8rem;
     }
-
-    /* Perkecil slot drag-and-drop */
-    .slot-pemain {
-        height: 40px; /* Kurangi tinggi slot */
+    .tim { 
+        width: 100%; 
+        text-align: center; 
     }
-
-    /* Perkecil tulisan placeholder di dalam slot */
-    .slot-pemain:empty::before {
-        font-size: 0.75rem;
+    .vs-separator { 
+        margin: 0.5rem 0;
+        font-size: 1.2rem;
     }
-
-    /* Perkecil 'chip' nama pemain */
-    .item-pemain {
-        padding: 4px 10px;
-        font-size: 0.8rem;
-    }
-    
-    /* Perkecil pemisah 'VS' */
-    .vs-separator {
-        font-size: 1.5rem;
-        margin: 0 0.5rem; /* Kurangi jarak horizontal */
-    }
-    
-    /* Perkecil input skor */
-    .kolom-skor {
-        margin-top: 1rem;
-    }
-    .input-skor {
-        width: 60px; /* Perkecil lebar input */
-        padding: 8px;
-        font-size: 0.9rem;
-    }
-
-    /* Perkecil tombol Finish Match */
-    .tombol-selesai-match {
-        padding: 8px 12px;
-        font-size: 0.9rem;
-        margin-top: 1rem;
+    .tim-kiri, .tim-kanan { 
+        text-align: center; 
     }
 }
 
-/* Menengahkan seluruh bagian pertandingan */
-#setup-pemain-dan-match {
+/* PERUBAHAN DI SINI */
+.highlight-text {
+    color: var(--primary-color);
+}
+
+/* Biar nama pemain tetap sejajar dan tidak loncat */
+.slot-pemain {
+    flex-direction: row; /* selalu sejajar horizontal */
+    gap: 4px;
+}
+
+/* Jika nama panjang, tetap terpotong dan tidak bikin turun */
+
+/* Wadah untuk semua tombol aksi, diposisikan di kanan atas */
+.match-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     display: flex;
-    flex-direction: column;
-    align-items: center; /* Ini akan menengahkan semua item di dalamnya */
+    align-items: center;
+    gap: 8px; /* Jarak antar tombol */
+    z-index: 10;
 }
 
-.pemain-section, .pertandingan-section {
-    width: 100%;
+/* Gaya dasar untuk TOMBOL IKON (Hapus & Edit) */
+.match-action-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    margin: 0;
+    border-radius: 50%; /* Membuat latar hover menjadi bulat */
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.2s ease-in-out;
 }
 
-#tombol-share-klasemen {
-    margin-bottom: 1.5rem;
-}
 
-.tombol-ubah-password {
-    background-color: var(--warning-color);
-    color: black;
-    font-size: 0.9rem;
-    padding: 5px 10px;
-}
