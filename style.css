@@ -18,14 +18,14 @@
 body {
     font-family: var(--font-family);
     text-align: center;
-    background-color: var(--light-color); /* Latar belakang putih */
+    background-color: var(--light-color);
     color: var(--text-color);
     margin: 0;
     padding: 2rem 1rem;
 }
 
 .page { 
-    max-width: 480px; /* Layout lebih sempit agar fokus di tengah */
+    max-width: 480px;
     margin: auto; 
     background-color: var(--light-color); 
     padding: 2rem 1rem; 
@@ -97,8 +97,6 @@ button:hover {
     background-color: var(--primary-hover);
 }
 
-
-/* General input styling */
 input[type="text"], input[type="number"], select {
     width: 100%;
     padding: 10px;
@@ -111,15 +109,14 @@ input[type="text"], input[type="number"], select {
 input:focus, select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(60, 109, 85, 0.2); /* Adjusted shadow color for green */
+    box-shadow: 0 0 0 2px rgba(60, 109, 85, 0.2);
 }
-
 
 /* =====================================================================
    LAYOUT ADJUSTMENTS FOR SPACING
    ===================================================================== */
 .tombol-kembali { 
-    all: unset; /* Reset all default button styles */
+    all: unset;
     cursor: pointer; 
     position: absolute; 
     top: 20px; 
@@ -136,16 +133,16 @@ input:focus, select:focus {
     background-color: #f0f0f0;
 }
 
-/* Adjust top margin for elements immediately after .tombol-kembali to push them down */
 #halaman-daftar-hari h2,
 #halaman-utama h2,
-#halaman-klasemen-umum h2 {
-    margin-top: 3.5rem; /* More space from the back button */
+#halaman-klasemen-umum h2,
+#halaman-stats-pemain h2 {
+    margin-top: 3.5rem;
 }
 
 
 /* =====================================================================
-   CLUB LIST (Sesuai Desain Final)
+   CLUB LIST
    ===================================================================== */
 #container-daftar-klub {
     margin: 2rem 0;
@@ -163,8 +160,8 @@ input:focus, select:focus {
     padding: 1.5rem;
     border-radius: var(--border-radius);
     transition: all 0.2s ease-in-out;
-    background-color: var(--dark-color); /* Latar belakang hitam */
-    color: var(--light-color); /* Teks putih */
+    background-color: var(--dark-color);
+    color: var(--light-color);
 }
 .klub-item-container:hover {
     transform: translateY(-3px);
@@ -244,14 +241,14 @@ input:focus, select:focus {
     align-items: center;
     padding: 1rem;
     border-radius: var(--border-radius);
-    background-color: #f8f9fa; /* Light background for day items */
+    background-color: #f8f9fa;
     border: 1px solid var(--border-color);
 }
 
 .hari-item-content {
     flex-grow: 1;
     text-align: left;
-    padding-right: 1rem; /* Space between name and buttons */
+    padding-right: 1rem;
     cursor: pointer;
     font-size: 1.1rem;
     font-weight: 500;
@@ -261,14 +258,13 @@ input:focus, select:focus {
     color: var(--primary-color);
 }
 
-
 .hari-action-buttons {
     display: flex;
-    gap: 0.5rem; /* Space between rename and delete buttons */
+    gap: 0.5rem;
 }
 
 .tombol-rename-hari, .tombol-hapus-hari {
-    all: unset; /* Reset button styles */
+    all: unset;
     cursor: pointer;
     font-size: 1.2rem;
     padding: 5px 8px;
@@ -276,17 +272,13 @@ input:focus, select:focus {
     transition: background-color 0.2s ease;
 }
 
-.tombol-rename-hari {
-    color: var(--text-muted);
-}
+.tombol-rename-hari { color: var(--text-muted); }
 .tombol-rename-hari:hover {
     color: var(--primary-color);
     background-color: rgba(60, 109, 85, 0.1);
 }
 
-.tombol-hapus-hari {
-    color: var(--text-muted);
-}
+.tombol-hapus-hari { color: var(--text-muted); }
 .tombol-hapus-hari:hover {
     color: var(--danger-color);
     background-color: rgba(220, 53, 69, 0.1);
@@ -309,9 +301,7 @@ input:focus, select:focus {
     gap: 0.5rem;
     margin-bottom: 1rem;
 }
-.input-group input {
-    flex-grow: 1;
-}
+.input-group input { flex-grow: 1; }
 .input-group button {
     background-color: var(--dark-color);
     color: var(--light-color);
@@ -328,7 +318,7 @@ input:focus, select:focus {
 
 .kotak-daftar-pemain { 
     border: 2px dashed var(--border-color); 
-    min-height: 100px;  /* Tinggi minimum tidak terlalu besar */
+    min-height: 100px;
     padding: 10px; 
     display: flex;
     flex-wrap: wrap;
@@ -339,28 +329,22 @@ input:focus, select:focus {
 }
 
 .item-pemain { 
-    padding: 4px 8px; /* Padding sangat dikecilkan */
-    font-size: 0.7rem; /* Font sangat dikecilkan */
+    padding: 4px 8px;
+    font-size: 0.7rem;
     display: inline-block;
-    max-width: 150px;      /* Batasi lebar maksimum nama */
-    white-space: nowrap;   /* Cegah teks turun ke bawah */
-    overflow: hidden;      /* Sembunyikan teks yang meluber */
-    text-overflow: ellipsis; /* Tampilkan "..." untuk teks yang terpotong */
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     vertical-align: middle;
     background-color: var(--primary-color);
     color: var(--light-color);
     border-radius: 4px;
     cursor: pointer;
 }
-.item-pemain:hover {
-    background-color: var(--primary-hover);
-}
+.item-pemain:hover { background-color: var(--primary-hover); }
 
-
-/* Match Type Selection */
-#pilihan-tipe-pertandingan h3 {
-    margin-bottom: 1.5rem;
-}
+#pilihan-tipe-pertandingan h3 { margin-bottom: 1.5rem; }
 #pilihan-tipe-pertandingan button {
     background-color: var(--light-color);
     color: var(--dark-color);
@@ -374,10 +358,8 @@ input:focus, select:focus {
 #pilihan-tipe-pertandingan button:hover {
     background-color: var(--dark-color);
     color: var(--light-color);
-    transform: translateY(-2px);
 }
 
-/* Match Box Styling */
 .pertandingan-section h3 {
     margin-top: 2rem;
     margin-bottom: 1.5rem;
@@ -390,7 +372,7 @@ input:focus, select:focus {
     padding: 1rem;
     margin-bottom: 1rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    position: relative; /* For action buttons positioning */
+    position: relative;
 }
 
 .judul-match {
@@ -406,24 +388,6 @@ input:focus, select:focus {
     letter-spacing: 0.5px;
 }
 
-.match-action-btn {
-    background-color: transparent;
-    border: none;
-    font-size: 1.1rem;
-    padding: 5px;
-    margin: 0;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-    color: var(--text-muted); /* Default for action buttons */
-}
-.match-action-btn:hover {
-    background-color: #eee;
-    transform: translateY(-1px);
-}
-
-.tombol-hapus-match:hover {
-    color: var(--danger-color);
-}
 .match-actions button {
     border: none;
     background-color: transparent;
@@ -432,10 +396,7 @@ input:focus, select:focus {
     border-radius: 4px;
     transition: all 0.2s ease;
 }
-
-.match-actions button:hover {
-    transform: translateY(-1px);
-}
+.match-actions button:hover { transform: translateY(-1px); }
 
 .tombol-hapus-match {
     font-size: 1.8rem;
@@ -446,9 +407,7 @@ input:focus, select:focus {
     background-color: rgba(220, 53, 69, 0.1);
 }
 
-.tombol-edit-match {
-    font-size: 1.1rem;
-}
+.tombol-edit-match { font-size: 1.1rem; }
 .tombol-edit-match:hover {
     color: var(--primary-color);
     background-color: rgba(60, 109, 85, 0.1);
@@ -470,21 +429,19 @@ input:focus, select:focus {
     background-color: var(--primary-hover);
 }
 
-
 .match-layout-container {
     display: flex;
     justify-content: space-around;
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 1rem;
-    flex-wrap: nowrap; /* Ensures it stays as a row */
+    flex-wrap: nowrap;
 }
 
 .tim {
     flex: 1;
-    min-width: 0; /* PENTING: Membiarkan kotak menyusut di bawah lebar kontennya */
+    min-width: 0;
 }
-
 .tim-kiri { text-align: right; }
 .tim-kanan { text-align: left; }
 
@@ -512,8 +469,6 @@ input:focus, select:focus {
     background-color: #e8f5e9;
     border-color: #4caf50;
 }
-
-/* Placeholder text for empty slots */
 .slot-pemain:empty::before {
     content: 'Click to Add Player';
     color: #b0b0b0;
@@ -522,15 +477,11 @@ input:focus, select:focus {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-
-.slot-pemain .item-pemain {
-    margin: 0; /* Override default margin */
-}
-
+.slot-pemain .item-pemain { margin: 0; }
 .tim-slot {
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Space between player slots in double mode */
+    gap: 5px;
 }
 
 .kolom-skor {
@@ -541,23 +492,21 @@ input:focus, select:focus {
     margin-top: 1rem;
 }
 .kolom-skor input {
-    width: 60px; /* Fixed width for score inputs */
+    width: 60px;
     text-align: center;
     padding: 8px;
-    margin: 0; /* Override default margin */
+    margin: 0;
 }
 .kolom-skor span {
     font-weight: 700;
     font-size: 1.2rem;
     color: var(--dark-color);
 }
-
 .pemisah-match {
     border: none;
     border-top: 2px dashed var(--border-color);
     margin: 3rem 0;
 }
-
 
 /* =====================================================================
    STANDINGS PAGE
@@ -565,7 +514,7 @@ input:focus, select:focus {
 .filter-klasemen {
     margin: 2rem 0;
     display: flex;
-    flex-direction: column; /* Stack label and select */
+    flex-direction: column;
     align-items: center;
     gap: 0.5rem;
 }
@@ -575,7 +524,7 @@ input:focus, select:focus {
 }
 .filter-klasemen select {
     width: 100%;
-    max-width: 250px; /* Limit width of dropdown */
+    max-width: 250px;
     text-align: center;
     padding: 8px;
     border-radius: var(--border-radius);
@@ -584,43 +533,147 @@ input:focus, select:focus {
 
 #container-klasemen-umum {
     margin-top: 2rem;
-    overflow-x: auto; /* Enable horizontal scrolling for tables on small screens */
+    overflow-x: auto;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     background-color: var(--light-color);
     padding: 0.5rem;
 }
-
 #container-klasemen-umum table { 
     width: 100%; 
     border-collapse: collapse; 
-    min-width: 400px; /* Ensure table is readable on small screens */
+    min-width: 400px;
 }
-
 #container-klasemen-umum th, #container-klasemen-umum td { 
     padding: 10px 12px; 
     border-bottom: 1px solid var(--border-color); 
     text-align: left; 
-    white-space: nowrap; /* Prevent text wrapping in table cells */
+    white-space: nowrap;
     font-size: 0.9rem;
 }
-
 #container-klasemen-umum th { 
     background-color: #f0f0f0; 
     font-weight: 600;
     text-transform: uppercase;
     color: var(--text-color);
 }
-#container-klasemen-umum tr:last-child td {
-    border-bottom: none;
+#container-klasemen-umum tr:last-child td { border-bottom: none; }
+#container-klasemen-umum tbody tr:hover { background-color: #f8f8f8; }
+
+.nama-pemain-klasemen {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--primary-color);
 }
-#container-klasemen-umum tbody tr:hover {
-    background-color: #f8f8f8;
+.nama-pemain-klasemen:hover {
+    text-decoration: underline;
 }
 
 /* =====================================================================
-   MODAL STYLES (New)
+   PLAYER STATS PAGE (REVISED)
+   ===================================================================== */
+#container-stats-pemain {
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* REVISED: groups content in the middle */
+    padding: 2.5rem 1.5rem;
+    box-sizing: border-box;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+}
+
+.stats-header {
+    margin-bottom: 3rem; /* REVISED: adds space below header */
+}
+
+.stats-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2rem; /* REVISED: increased gap */
+    margin-bottom: 3rem; /* REVISED: adds space before footer */
+}
+.stats-header #stats-nama-pemain {
+    font-size: 3rem;
+    line-height: 1.1;
+    margin: 0;
+    word-break: break-word;
+}
+.stats-header #stats-konteks {
+    margin: 0.5rem 0 0 0;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+.stat-item .stat-label {
+    font-size: 1rem; /* REVISED: smaller label */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 0;
+}
+.stat-item .stat-value {
+    font-size: 4rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1;
+}
+.stats-footer {
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+.stats-footer .highlight-text {
+    color: var(--primary-color);
+}
+
+/* Theme for White BG */
+#container-stats-pemain.stats-bg-white {
+    background-color: var(--light-color);
+    border: 1px solid var(--border-color);
+}
+.stats-bg-white, .stats-bg-white h1, .stats-bg-white .stat-value {
+    color: var(--dark-color);
+}
+.stats-bg-white .stat-label, .stats-bg-white #stats-konteks {
+    color: #555;
+}
+/* Theme for Transparent BG */
+#container-stats-pemain.stats-bg-transparent {
+    background-color: transparent;
+    border: 1px solid transparent;
+}
+.stats-bg-transparent, .stats-bg-transparent h1 {
+    color: var(--light-color);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.stats-controls { margin-top: 2rem; }
+.stats-controls .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.stats-controls .button-group button {
+    border: 2px solid var(--dark-color);
+    background: var(--light-color);
+    color: var(--dark-color);
+    padding: 8px 16px;
+    font-weight: 600;
+    border-radius: var(--border-radius);
+}
+.stats-controls .button-group button:hover {
+    background: var(--dark-color);
+    color: var(--light-color);
+}
+
+/* =====================================================================
+   MODAL STYLES
    ===================================================================== */
 .modal-overlay {
     position: fixed;
@@ -664,27 +717,23 @@ input:focus, select:focus {
     transform: translateY(-1px);
 }
 #modal-close-button {
-    background-color: #6c757d; /* Muted gray for cancel */
+    background-color: #6c757d;
 }
-
 
 /* =====================================================================
    RESPONSIVE & MOBILE ADJUSTMENTS
    ===================================================================== */
 @media (max-width: 480px) {
-    /* More Compact Standings Table */
-    #container-klasemen-umum table {
-        min-width: 0; /* Allow table to shrink fully */
-    }
+    #container-klasemen-umum table { min-width: 0; }
     #container-klasemen-umum th, #container-klasemen-umum td {
-        padding: 8px 4px; /* Reduce padding */
-        font-size: 0.8rem; /* Reduce font size */
-        white-space: normal; /* Allow text to wrap */
-        text-align: center; /* Center align for compact view */
+        padding: 8px 4px;
+        font-size: 0.8rem;
+        white-space: normal;
+        text-align: center;
     }
     #container-klasemen-umum th:nth-child(2),
     #container-klasemen-umum td:nth-child(2) {
-        text-align: left; /* Keep player name left-aligned */
+        text-align: left;
         white-space: normal;
     }
 }
@@ -698,44 +747,39 @@ input:focus, select:focus {
     .tombol-pengaturan-klub { font-size: 1.2rem; }
     .menu-aksi-klub { width: 150px; top: 35px; }
 
-    /* REVISED: Keep match layout horizontal but make it more compact */
-    .match-layout-container { 
-        gap: 0.25rem; /* Reduce gap */
-    }
-    .kotak-pertandingan {
-        padding: 0.8rem;
-    }
+    .match-layout-container { gap: 0.25rem; }
+    .kotak-pertandingan { padding: 0.8rem; }
     .vs-separator { 
         margin: 0;
         padding: 0 0.25rem;
         font-size: 1.2rem;
     }
-    .tim-kiri, .tim-kanan { 
-        text-align: center; 
-    }
+    .tim-kiri, .tim-kanan { text-align: center; }
+
+    .stats-header #stats-nama-pemain { font-size: 2.5rem; }
+    .stat-item .stat-value { font-size: 3rem; }
+    .stat-item .stat-label { font-size: 1rem; }
 }
 
 .highlight-text {
     color: var(--primary-color);
 }
-
 .match-actions {
     position: absolute;
     top: 10px;
     right: 10px;
     display: flex;
     align-items: center;
-    gap: 8px; /* Jarak antar tombol */
+    gap: 8px;
     z-index: 10;
 }
-
 .match-action-btn {
     background: transparent;
     border: none;
     cursor: pointer;
     padding: 5px;
     margin: 0;
-    border-radius: 50%; /* Membuat latar hover menjadi bulat */
+    border-radius: 50%;
     width: 32px;
     height: 32px;
     display: flex;
