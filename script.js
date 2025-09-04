@@ -56,7 +56,6 @@ const tombolShareKlasemen = document.getElementById('tombol-share-klasemen');
 // =====================================================================
 async function saveToJSONBin(data) {
     const headers = { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY };
-    // Selalu gunakan versi terbaru dari data untuk menghindari konflik
     const response = await fetch(JSONBIN_API_URL, { method: 'PUT', headers: headers, body: JSON.stringify(data) });
     if (!response.ok) throw new Error(`Failed to save data: ${response.status}`);
 }
@@ -119,29 +118,44 @@ async function initializeApp() {
 // =====================================================================
 // DRAG-AND-DROP LOGIC & HELPERS
 // =====================================================================
-// ... (Fungsi-fungsi di bagian ini tetap sama, tidak perlu diubah)
-// Fungsi seperti allowDrop, drop, getActiveClub, getActiveDay, createPlayerElement, dll.
-// ... (Sisa fungsi-fungsi ini akan saya sertakan di bawah)
-// =====================================================================
-
-// (Lanjutan dari Drag-and-Drop)
 daftarPemain.addEventListener('dragstart', (event) => {
     if (event.target.classList.contains('item-pemain')) {
         event.dataTransfer.setData('text/plain', event.target.textContent);
     }
 });
+
 function allowDrop(event) { event.preventDefault(); }
-function drop(event) {
-    event.preventDefault();
-    const namaPemain = event.dataTransfer.getData('text/plain');
-    if (namaPemain && event.target.classList.contains('slot-pemain') && event.target.children.length === 0) {
-        const elemenBaruDiSlot = document.createElement('div');
-        elemenBaruDiSlot.textContent = namaPemain;
-        elemenBaruDiSlot.className = 'item-pemain';
-        pasangUlangEventListeners();
-        event.target.appendChild(elemenBaruDiSlot);
+
+function handleDragEnter(event) {
+    const targetSlot = event.target.closest('.slot-pemain');
+    if (targetSlot) {
+        targetSlot.classList.add('drag-over-highlight');
     }
 }
+
+function handleDragLeave(event) {
+    const targetSlot = event.target.closest('.slot-pemain');
+    if (targetSlot) {
+        targetSlot.classList.remove('drag-over-highlight');
+    }
+}
+
+function drop(event) {
+    event.preventDefault();
+    const targetSlot = event.target.closest('.slot-pemain');
+    if (targetSlot) {
+        targetSlot.classList.remove('drag-over-highlight');
+        const namaPemain = event.dataTransfer.getData('text/plain');
+        if (namaPemain && targetSlot.children.length === 0) {
+            const elemenBaruDiSlot = document.createElement('div');
+            elemenBaruDiSlot.textContent = namaPemain;
+            elemenBaruDiSlot.className = 'item-pemain';
+            targetSlot.appendChild(elemenBaruDiSlot);
+            pasangUlangEventListeners();
+        }
+    }
+}
+
 function getActiveClub() { return tennisAppClubs.find(c => c.clubId === activeClubId); }
 function getActiveDay() {
     const club = getActiveClub();
@@ -158,10 +172,14 @@ function createPlayerElement(playerName) {
 }
 function pasangUlangEventListeners() {
     document.querySelectorAll('.slot-pemain .item-pemain').forEach(pemainDiSlot => {
-        if (pemainDiSlot.onclick) return;
+        if (pemainDiSlot.onclick && pemainDiSlot.onclick.toString().includes('this.remove()')) return; // Avoid re-attaching
         pemainDiSlot.onclick = function() {
             const matchBox = this.closest('.kotak-pertandingan');
-            if(!matchBox) return;
+            if(!matchBox) { // If player is in the main player list
+                this.remove(); 
+                saveState();
+                return;
+            }
             const isFinished = wadahPertandinganSelesai.contains(matchBox);
             const isBeingEdited = matchBox.querySelector('.tombol-save-match');
             if (!isFinished || isBeingEdited) { this.remove(); }
@@ -171,31 +189,31 @@ function pasangUlangEventListeners() {
         const matchId = parseInt(matchBox.id.split('-')[1]);
         if (!matchId) return;
         const tombolSelesai = matchBox.querySelector('.tombol-selesai-match');
-        if (tombolSelesai) tombolSelesai.onclick = () => selesaiMatch(matchId);
+        if (tombolSelesai && !tombolSelesai.onclick) tombolSelesai.onclick = () => selesaiMatch(matchId);
         const tombolHapus = matchBox.querySelector('.tombol-hapus-match');
-        if (tombolHapus) tombolHapus.onclick = () => hapusMatch(matchId);
+        if (tombolHapus && !tombolHapus.onclick) tombolHapus.onclick = () => hapusMatch(matchId);
         const tombolEdit = matchBox.querySelector('.tombol-edit-match');
-        if (tombolEdit) tombolEdit.onclick = () => editMatch(matchId);
+        if (tombolEdit && !tombolEdit.onclick) tombolEdit.onclick = () => editMatch(matchId);
         const tombolSave = matchBox.querySelector('.tombol-save-match');
-        if (tombolSave) tombolSave.onclick = () => saveMatch(matchId);
+        if (tombolSave && !tombolSave.onclick) tombolSave.onclick = () => saveMatch(matchId);
     });
 }
 
-// =====================================================================
-// CLUB & DAY MANAGEMENT (DIUBAH)
-// =====================================================================
 
+// =====================================================================
+// CLUB & DAY MANAGEMENT
+// =====================================================================
 tombolTambahKlubBaru.addEventListener('click', async () => {
     const namaKlub = prompt("Enter new club name:");
     if (!namaKlub || namaKlub.trim() === '') return;
 
     const passwordKlub = prompt(`Enter a password for the club "${namaKlub.trim()}":`);
-    if (!passwordKlub) return; // User cancelled or entered empty password
+    if (!passwordKlub) return;
 
     tennisAppClubs.push({
         clubId: Date.now(),
         clubName: namaKlub.trim(),
-        clubPassword: passwordKlub, // Password disimpan di sini
+        clubPassword: passwordKlub,
         days: []
     });
     renderDaftarKlub();
@@ -206,15 +224,72 @@ function renderDaftarKlub() {
     containerDaftarKlub.innerHTML = '';
     if (tennisAppClubs && tennisAppClubs.length > 0) {
         tennisAppClubs.forEach(club => {
-            const itemHTML = `<div class="klub-item-container"><span class="nama-klub-item">${club.clubName}</span><div class="klub-item-actions"><button class="tombol-ubah-password" onclick="ubahPasswordKlub(${club.clubId})">🔑</button><button onclick="renameKlub(${club.clubId})">&#9998;</button><button class="tombol-buka-klub" onclick="muatKlub(${club.clubId})">Open</button><button class="tombol-hapus-hari" onclick="hapusKlub(${club.clubId})">&times;</button></div></div>`;
-            containerDaftarKlub.insertAdjacentHTML('beforeend', itemHTML);
+            const itemContainer = document.createElement('div');
+            itemContainer.className = 'klub-item-container';
+            itemContainer.onclick = (event) => {
+                if (!event.target.closest('.tombol-pengaturan-klub, .menu-aksi-klub')) {
+                    muatKlub(club.clubId);
+                }
+            };
+
+            const namaSpan = document.createElement('span');
+            namaSpan.className = 'nama-klub-item';
+            namaSpan.textContent = club.clubName;
+
+            const tombolPengaturan = document.createElement('button');
+            tombolPengaturan.className = 'tombol-pengaturan-klub';
+            tombolPengaturan.innerHTML = '&#9881;'; // Simbol gerigi ⚙️
+            tombolPengaturan.onclick = (event) => toggleMenuAksi(event, club.clubId);
+
+            const menuAksi = document.createElement('div');
+            menuAksi.className = 'menu-aksi-klub';
+            menuAksi.id = `menu-aksi-${club.clubId}`;
+            menuAksi.innerHTML = `
+                <a href="#" onclick="renameKlub(${club.clubId}, event)">Rename</a>
+                <a href="#" onclick="ubahPasswordKlub(${club.clubId}, event)">Change Password</a>
+                <a href="#" onclick="hapusKlub(${club.clubId}, event)" class="menu-aksi-hapus">Delete</a>
+            `;
+
+            menuAksi.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
+
+            itemContainer.appendChild(namaSpan);
+            itemContainer.appendChild(tombolPengaturan);
+            itemContainer.appendChild(menuAksi);
+            containerDaftarKlub.appendChild(itemContainer);
         });
     } else {
         containerDaftarKlub.innerHTML = '<p>No clubs found. Create a new club to begin.</p>';
     }
 }
 
-function hapusKlub(clubId) {
+function toggleMenuAksi(event, clubId) {
+    event.stopPropagation();
+    const currentMenu = document.getElementById(`menu-aksi-${clubId}`);
+    const currentContainer = currentMenu.closest('.klub-item-container');
+
+    // Close other menus and reset their container's z-index
+    document.querySelectorAll('.menu-aksi-klub').forEach(menu => {
+        if (menu.id !== `menu-aksi-${clubId}`) {
+            menu.style.display = 'none';
+            const container = menu.closest('.klub-item-container');
+            if (container) container.style.zIndex = 'auto';
+        }
+    });
+
+    // Toggle the current menu and its container's z-index
+    if (currentMenu.style.display === 'block') {
+        currentMenu.style.display = 'none';
+        if (currentContainer) currentContainer.style.zIndex = 'auto';
+    } else {
+        currentMenu.style.display = 'block';
+        if (currentContainer) currentContainer.style.zIndex = '100'; // High value to ensure it's on top
+    }
+}
+
+function hapusKlub(clubId, event) {
+    if (event) event.stopPropagation();
     const club = tennisAppClubs.find(c => c.clubId === clubId);
     if (!club) return;
     
@@ -225,12 +300,13 @@ function hapusKlub(clubId) {
             renderDaftarKlub();
             saveState();
         }
-    } else if (password !== null) { // Jika tidak cancel
+    } else if (password !== null) {
         alert('Incorrect password!');
     }
 }
 
-function renameKlub(clubId) {
+function renameKlub(clubId, event) {
+    if (event) event.stopPropagation();
     const club = tennisAppClubs.find(c => c.clubId === clubId);
     if (!club) return;
 
@@ -247,32 +323,28 @@ function renameKlub(clubId) {
     }
 }
 
-function ubahPasswordKlub(clubId) {
+function ubahPasswordKlub(clubId, event) {
+    if (event) event.stopPropagation();
     const club = tennisAppClubs.find(c => c.clubId === clubId);
     if (!club) return;
 
-    // 1. Minta password lama untuk verifikasi
     const oldPassword = prompt(`To change the password for "${club.clubName}", please enter the old password:`);
-    if (oldPassword === null) return; // User cancelled
+    if (oldPassword === null) return;
 
-    // 2. Periksa apakah password lama benar
     if (oldPassword !== club.clubPassword) {
         return alert('Incorrect old password!');
     }
 
-    // 3. Jika benar, minta password baru
     const newPassword = prompt("Enter the new password:");
-    if (!newPassword) { // User cancelled or entered empty string
+    if (!newPassword) {
         return alert("New password cannot be empty.");
     }
 
-    // 4. Minta konfirmasi password baru
     const confirmPassword = prompt("Enter the new password again to confirm:");
     if (newPassword !== confirmPassword) {
         return alert("The new passwords do not match. Please try again.");
     }
 
-    // 5. Jika semua cocok, ubah password dan simpan
     club.clubPassword = newPassword;
     saveState();
     alert("Password changed successfully!");
@@ -298,11 +370,15 @@ kembaliKeDaftarKlub.addEventListener('click', () => {
     tampilkanHalaman('halaman-daftar-klub');
 });
 
-// ... (Sisa fungsi seperti renderDaftarHari, hapusHari, renameHari, dll. tetap sama)
 tombolTambahHariBaru.addEventListener('click', () => {
     const club = getActiveClub();
     if (!club) return;
     if(!club.days) club.days = [];
+    const batasanHari = 10;
+    if (club.days.length >= batasanHari) {
+        alert(`You have reached the maximum of ${batasanHari} days for the free version. Please contact the developer to upgrade.`);
+        return; 
+    }
     const nomorHariBaru = (club.days.length || 0) + 1;
     club.days.push({ id: Date.now(), name: `Day ${nomorHariBaru}`, type: null, players: [], matchResults: [], matchesHTML: { active: '', finished: '' }, nextMatchNum: 1 });
     renderDaftarHari();
@@ -316,27 +392,41 @@ function renderDaftarHari() {
         club.days.forEach(day => {
             const container = document.createElement('div');
             container.className = 'hari-item-container';
-            const tombolHari = document.createElement('button');
+            
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'hari-item-content';
+            contentWrapper.onclick = () => muatHari(day.id); 
+
+            const tombolHari = document.createElement('span');
             tombolHari.textContent = day.name;
-            tombolHari.className = 'tombol-hari';
-            tombolHari.onclick = () => muatHari(day.id);
+            tombolHari.className = 'nama-hari';
+            
+            const actionButtons = document.createElement('div');
+            actionButtons.className = 'hari-action-buttons';
+
             const tombolRename = document.createElement('button');
             tombolRename.innerHTML = '&#9998;';
             tombolRename.className = 'tombol-rename-hari';
-            tombolRename.onclick = () => renameHari(day.id);
+            tombolRename.onclick = (e) => { e.stopPropagation(); renameHari(day.id); };
+
             const tombolHapus = document.createElement('button');
             tombolHapus.innerHTML = '&times;';
             tombolHapus.className = 'tombol-hapus-hari';
-            tombolHapus.onclick = () => hapusHari(day.id);
-            container.appendChild(tombolHari);
-            container.appendChild(tombolRename);
-            container.appendChild(tombolHapus);
+            tombolHapus.onclick = (e) => { e.stopPropagation(); hapusHari(day.id); };
+
+            contentWrapper.appendChild(tombolHari);
+            actionButtons.appendChild(tombolRename);
+            actionButtons.appendChild(tombolHapus);
+            
+            container.appendChild(contentWrapper);
+            container.appendChild(actionButtons); 
             containerDaftarHari.appendChild(container);
         });
     } else {
         containerDaftarHari.innerHTML = `<p>No tournament days yet. Click the button below to start.</p>`;
     }
 }
+
 
 function hapusHari(dayId) {
     const club = getActiveClub();
@@ -362,7 +452,6 @@ function renameHari(dayId) {
     }
 }
 
-// ... (Sisa fungsi match management juga tetap sama)
 function muatHari(dayId) {
     activeDayId = dayId;
     const club = getActiveClub();
@@ -422,62 +511,179 @@ function tambahMatchBaru() {
     day.nextMatchNum++;
     saveState();
 }
+
+/**
+ * KODE INI DIPERBAIKI UNTUK MENGATASI BUG TOMBOL SAVE
+ * Helper function to ensure the action buttons wrapper exists in a match header.
+ * This handles old data that might not have the wrapper.
+ * @param {HTMLElement} matchHeader - The .match-header element.
+ * @returns {HTMLElement} - The .match-actions-wrapper element.
+ */
+function ensureActionsWrapper(matchHeader) {
+    let actionsWrapper = matchHeader.querySelector('.match-actions-wrapper');
+    if (!actionsWrapper) {
+        actionsWrapper = document.createElement('div');
+        actionsWrapper.className = 'match-actions-wrapper';
+        
+        // MIGRASI: Cari tombol-tombol aksi lama yang mungkin ada di luar wrapper
+        const oldDeleteBtn = matchHeader.querySelector('.tombol-hapus-match');
+        if (oldDeleteBtn && oldDeleteBtn.parentElement === matchHeader) {
+            actionsWrapper.appendChild(oldDeleteBtn);
+        }
+        const oldEditBtn = matchHeader.querySelector('.tombol-edit-match');
+        if (oldEditBtn && oldEditBtn.parentElement === matchHeader) {
+            actionsWrapper.appendChild(oldEditBtn);
+        }
+        
+        matchHeader.appendChild(actionsWrapper);
+    }
+    return actionsWrapper;
+}
+
 function gambarPertandingan(matchId, matchNum, tipe) {
-    const tombolHapusHTML = `<button class="tombol-hapus-match">&times;</button>`;
+    // Menambahkan div khusus untuk tombol aksi (edit, save, hapus)
+    const actionsHTML = `
+    <div class="match-actions">
+        <button class="match-action-btn tombol-hapus-match" onclick="hapusMatch(${matchId})">&times;</button>
+    </div>
+`;
+
     let htmlPertandingan = '';
+    const slotAttrs = `class="slot-pemain" ondragover="allowDrop(event)" ondrop="drop(event)"`;
+    const inputType = `type="number" class="input-skor" placeholder="Skor"`;
+
     if (tipe === 'single') {
-        htmlPertandingan = `<div class="kotak-pertandingan" id="match-${matchId}">${tombolHapusHTML}<p class="judul-match">MATCH ${matchNum} (SINGLE)</p><div class="match-layout-container"><div class="tim tim-kiri"><div class="slot-pemain" ondragover="allowDrop(event)" ondrop="drop(event)"></div></div><div class="vs-separator">VS</div><div class="tim tim-kanan"><div class="slot-pemain" ondragover="allowDrop(event)" ondrop="drop(event)"></div></div></div><div class="kolom-skor"><input type="text" class="input-skor" placeholder="Player 1 Score"><span>-</span><input type="text" class="input-skor" placeholder="Player 2 Score"></div><button class="tombol-selesai-match">Finish Match</button></div>`;
+        htmlPertandingan = `
+            <div class="kotak-pertandingan" id="match-${matchId}">
+                ${actionsHTML}
+                <p class="judul-match">MATCH ${matchNum} (SINGLE)</p>
+                <div class="match-layout-container">
+                    <div class="tim tim-kiri"><div ${slotAttrs}></div></div>
+                    <div class="vs-separator">VS</div>
+                    <div class="tim tim-kanan"><div ${slotAttrs}></div></div>
+                </div>
+                <div class="kolom-skor">
+                    <input ${inputType}>
+                    <span>-</span>
+                    <input ${inputType}>
+                </div>
+                <button class="tombol-selesai-match" onclick="selesaiMatch(${matchId})">Finish Match</button>
+            </div>`;
     } else {
-        htmlPertandingan = `<div class="kotak-pertandingan" id="match-${matchId}">${tombolHapusHTML}<p class="judul-match">MATCH ${matchNum} (DOUBLE)</p><div class="match-layout-container"><div class="tim tim-kiri"><div class="tim-slot"><div class="slot-pemain" ondragover="allowDrop(event)" ondrop="drop(event)"></div><div class="slot-pemain" ondragover="allowDrop(event)" ondrop="drop(event)"></div></div></div><div class="vs-separator">VS</div><div class="tim tim-kanan"><div class="tim-slot"><div class="slot-pemain" ondragover="allowDrop(event)" ondrop="drop(event)"></div><div class="slot-pemain" ondragover="allowDrop(event)" ondrop="drop(event)"></div></div></div></div><div class="kolom-skor"><input type="text" class="input-skor" placeholder="Team 1 Score"><span>-</span><input type="text" class="input-skor" placeholder="Team 2 Score"></div><button class="tombol-selesai-match">Finish Match</button></div>`;
+        htmlPertandingan = `
+            <div class="kotak-pertandingan" id="match-${matchId}">
+                ${actionsHTML}
+                <p class="judul-match">MATCH ${matchNum} (DOUBLE)</p>
+                <div class="match-layout-container">
+                    <div class="tim tim-kiri"><div class="tim-slot"><div ${slotAttrs}></div><div ${slotAttrs}></div></div></div>
+                    <div class="vs-separator">VS</div>
+                    <div class="tim tim-kanan"><div class="tim-slot"><div ${slotAttrs}></div><div ${slotAttrs}></div></div></div>
+                </div>
+                <div class="kolom-skor">
+                    <input ${inputType}>
+                    <span>-</span>
+                    <input ${inputType}>
+                </div>
+                <button class="tombol-selesai-match" onclick="selesaiMatch(${matchId})">Finish Match</button>
+            </div>`;
     }
     wadahPertandingan.insertAdjacentHTML('afterbegin', htmlPertandingan);
-    pasangUlangEventListeners();
 }
+
 function selesaiMatch(matchId) {
     const day = getActiveDay(); if (!day) return;
     const matchBox = document.getElementById(`match-${matchId}`);
+    
+    // Validasi
     const semuaPemain = matchBox.querySelectorAll('.slot-pemain .item-pemain');
     const semuaSkor = matchBox.querySelectorAll('.input-skor');
-    if (semuaPemain.length < 2 || semuaSkor[0].value.trim() === '') return alert('Please fill in all players and scores!');
+    if (semuaSkor[0].value.trim() === '' || semuaSkor[1].value.trim() === '') {
+        return alert('Isi skor untuk kedua tim!');
+    }
+    const isSingle = !matchBox.querySelector('.tim-slot');
+    if ((isSingle && semuaPemain.length < 2) || (!isSingle && semuaPemain.length < 4)) {
+        return alert('Lengkapi semua pemain di slot pertandingan!');
+    }
+
+    // Proses data
     const tim = matchBox.querySelectorAll('.tim');
     const pemainTim1 = Array.from(tim[0].querySelectorAll('.item-pemain')).map(p => p.textContent).join(' & ');
     const pemainTim2 = Array.from(tim[1].querySelectorAll('.item-pemain')).map(p => p.textContent).join(' & ');
     const skor = Array.from(semuaSkor).map(s => s.value).join(' - ');
     const matchNum = parseInt(matchBox.querySelector('.judul-match').textContent.match(/\d+/)[0]);
-    day.matchResults.push({ id: matchId, matchNum: matchNum, tim1: pemainTim1, tim2: pemainTim2, skor: skor });
+    
+    day.matchResults.push({ id: matchId, matchNum, tim1: pemainTim1, tim2: pemainTim2, skor });
+    
     wadahPertandinganSelesai.appendChild(matchBox);
     matchBox.querySelector('.tombol-selesai-match').remove();
     semuaSkor.forEach(input => input.disabled = true);
+    
+    // BUAT TOMBOL EDIT
+    const actionContainer = matchBox.querySelector('.match-actions');
     const tombolEdit = document.createElement('button');
-    tombolEdit.textContent = 'Edit';
-    tombolEdit.className = 'tombol-edit-match';
+    tombolEdit.innerHTML = '&#9998;';
+    tombolEdit.className = 'match-action-btn tombol-edit-match';
     tombolEdit.onclick = () => editMatch(matchId);
-    matchBox.prepend(tombolEdit);
+    actionContainer.appendChild(tombolEdit);
+    
     saveState();
 }
+
+
+// === FUNGSI DIPERBAIKI DI SINI ===
 function editMatch(matchId) {
     const matchBox = document.getElementById(`match-${matchId}`);
     const skorInputs = matchBox.querySelectorAll('.input-skor');
-    skorInputs.forEach(input => { input.disabled = false; input.style.border = "2px solid blue"; });
-    matchBox.querySelector('.tombol-edit-match').classList.add('hidden');
+    skorInputs.forEach(input => {
+        input.disabled = false;
+        input.style.border = "2px solid var(--primary-color)";
+    });
+    
+    // HAPUS TOMBOL EDIT, BUAT TOMBOL SAVE
+    const actionContainer = matchBox.querySelector('.match-actions');
+    actionContainer.querySelector('.tombol-edit-match').remove();
+    
     const tombolSave = document.createElement('button');
     tombolSave.textContent = 'Save';
     tombolSave.className = 'tombol-save-match';
     tombolSave.onclick = () => saveMatch(matchId);
-    matchBox.prepend(tombolSave);
+    actionContainer.appendChild(tombolSave);
 }
+
+// === FUNGSI DIPERBAIKI DI SINI ===
 function saveMatch(matchId) {
     const day = getActiveDay(); if (!day) return;
     const matchBox = document.getElementById(`match-${matchId}`);
     const skorInputs = matchBox.querySelectorAll('.input-skor');
+    
+    if (skorInputs[0].value.trim() === '' || skorInputs[1].value.trim() === '') {
+        return alert('Skor tidak boleh kosong!');
+    }
+
     const skorBaru = Array.from(skorInputs).map(s => s.value).join(' - ');
     const indexPertandingan = day.matchResults.findIndex(hasil => hasil.id === matchId);
-    if (indexPertandingan > -1) { day.matchResults[indexPertandingan].skor = skorBaru; }
-    skorInputs.forEach(input => { input.disabled = true; input.style.border = "1px solid #ccc"; });
-    matchBox.querySelector('.tombol-save-match').remove();
-    matchBox.querySelector('.tombol-edit-match').classList.remove('hidden');
+    if (indexPertandingan > -1) {
+        day.matchResults[indexPertandingan].skor = skorBaru;
+    }
+    
+    skorInputs.forEach(input => {
+        input.disabled = true;
+        input.style.border = "1px solid var(--border-color)";
+    });
+    
+    // HAPUS TOMBOL SAVE, BUAT KEMBALI TOMBOL EDIT
+    const actionContainer = matchBox.querySelector('.match-actions');
+    actionContainer.querySelector('.tombol-save-match').remove();
+    
+    const tombolEdit = document.createElement('button');
+    tombolEdit.innerHTML = '&#9998;';
+    tombolEdit.className = 'tombol-edit-match';
+    tombolEdit.onclick = () => editMatch(matchId);
+    actionContainer.appendChild(tombolEdit);
+    
     saveState();
 }
+
 function hapusMatch(matchId) {
     if (!confirm('Are you sure you want to delete this match?')) { return; }
     const matchBox = document.getElementById(`match-${matchId}`);
@@ -509,11 +715,9 @@ function nomorUlangMatch() {
     day.nextMatchNum = semuaMatchBoxes.length + 1;
 }
 
-
 // =====================================================================
 // STANDINGS PAGE FUNCTIONS & EVENT LISTENERS
 // =====================================================================
-// ... (Semua fungsi klasemen tetap sama, tidak perlu diubah)
 kembaliDariKlasemen.addEventListener('click', () => {
     tampilkanHalaman('halaman-daftar-hari');
 });
@@ -652,9 +856,9 @@ function renderTabelKlasemen(data) {
                 <tr>
                     <th>Rk</th>
                     <th>Player</th>
-                    <th>Sets Pld</th>
-                    <th>Sets Won</th>
-                    <th>Sets Lost</th>
+                    <th>Pld</th>
+                    <th>Won</th>
+                    <th>Lost</th>
                     <th>W%</th>
                     <th>Pts</th>
                 </tr>
