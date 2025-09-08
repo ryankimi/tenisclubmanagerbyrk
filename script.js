@@ -677,11 +677,10 @@ tombolBgTransparan.addEventListener('click', () => {
     containerStatsPemain.classList.add('stats-bg-transparent');
 });
 
-// REVISED: New logic for saving image with proper scaling
+// REVISED: Player name is now hidden from the downloaded image
 tombolSaveStory.addEventListener('click', () => {
     const isTransparent = containerStatsPemain.classList.contains('stats-bg-transparent');
     
-    // Calculate the required scale to reach a 1080px width
     const scale = 1080 / containerStatsPemain.offsetWidth;
 
     const options = {
@@ -693,10 +692,13 @@ tombolSaveStory.addEventListener('click', () => {
     tombolSaveStory.textContent = 'Generating...';
     tombolSaveStory.disabled = true;
 
+    // Hide player name before capturing
+    statsNamaPemain.style.visibility = 'hidden';
+
     html2canvas(containerStatsPemain, options).then(canvas => {
-        const playerName = statsNamaPemain.textContent.replace(/ /g, '_').toLowerCase();
         const link = document.createElement('a');
-        link.download = `stats_${playerName}.png`;
+        // Use a generic filename as requested
+        link.download = `player_stats.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
     }).catch(err => {
@@ -705,6 +707,8 @@ tombolSaveStory.addEventListener('click', () => {
     }).finally(() => {
         tombolSaveStory.textContent = 'Save as Story';
         tombolSaveStory.disabled = false;
+        // Show player name again after capturing
+        statsNamaPemain.style.visibility = 'visible';
     });
 });
 
