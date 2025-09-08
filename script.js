@@ -63,7 +63,8 @@ const modalCloseButton = document.getElementById('modal-close-button');
 const kembaliDariStatsPemain = document.getElementById('kembali-dari-stats-pemain');
 const containerStatsPemain = document.getElementById('container-stats-pemain');
 const statsNamaPemain = document.getElementById('stats-nama-pemain');
-const statsKonteks = document.getElementById('stats-konteks');
+const statsKonteksKlub = document.getElementById('stats-konteks-klub');
+const statsKonteksHari = document.getElementById('stats-konteks-hari');
 const statsSetDimainkan = document.getElementById('stats-set-dimainkan-value');
 const statsSetMenang = document.getElementById('stats-set-menang-value');
 const statsWinRate = document.getElementById('stats-win-rate-value');
@@ -520,6 +521,52 @@ tombolLihatKlasemen.addEventListener('click', () => {
     tampilkanHalaman('halaman-klasemen-umum');
 });
 
+tombolShareKlasemen.addEventListener('click', () => {
+    const club = getActiveClub();
+    const filterDropdown = document.getElementById('filter-hari');
+    const selectedOption = filterDropdown.options[filterDropdown.selectedIndex];
+    const standingsTitle = selectedOption.text.replace(/\s*\(.*\)/, '');
+
+    const originalTable = document.querySelector('#container-klasemen-umum table');
+    if (!originalTable) {
+        alert('No standings table to capture!');
+        return;
+    }
+
+    const captureWrapper = document.createElement('div');
+    captureWrapper.className = 'standings-capture-wrapper';
+    captureWrapper.innerHTML = `
+        <h2 class="capture-title">${club.clubName}</h2>
+        <h3 class="capture-subtitle">Player Standings - ${standingsTitle}</h3>
+        ${originalTable.outerHTML}
+        <div class="capture-footer">
+            <p>TENNIS CLUB <span class="highlight-text">MANAGER</span></p>
+        </div>
+    `;
+    
+    captureWrapper.style.position = 'absolute';
+    captureWrapper.style.left = '-9999px';
+    captureWrapper.style.top = '0';
+    document.body.appendChild(captureWrapper);
+
+    tombolShareKlasemen.textContent = 'Generating...';
+    tombolShareKlasemen.disabled = true;
+
+    html2canvas(captureWrapper, { scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `standings_${club.clubName.replace(/ /g, '_').toLowerCase()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }).catch(err => {
+        console.error("Oops, something went wrong!", err);
+        alert("Failed to generate image. Please try again.");
+    }).finally(() => {
+        tombolShareKlasemen.textContent = 'Save as Image';
+        tombolShareKlasemen.disabled = false;
+        document.body.removeChild(captureWrapper);
+    });
+});
+
 function populateFilterHari() {
     const club = getActiveClub();
     const filterDropdown = document.getElementById('filter-hari');
@@ -606,10 +653,11 @@ function tampilkanStatsPemain(namaPemain) {
     const club = getActiveClub();
     const filterDropdown = document.getElementById('filter-hari');
     const selectedOption = filterDropdown.options[filterDropdown.selectedIndex];
-    const konteksTeks = `STATS WITH ${club.clubName} (${selectedOption.text})`;
-
+    
     statsNamaPemain.textContent = pemainData.nama;
-    statsKonteks.textContent = konteksTeks;
+    statsKonteksKlub.textContent = `STATS WITH ${club.clubName}`;
+    statsKonteksHari.textContent = selectedOption.text.replace(/\s*\(.*\)/, '');
+
     statsSetDimainkan.textContent = pemainData.setDimainkan;
     statsSetMenang.textContent = pemainData.setMenang;
     statsWinRate.textContent = `${pemainData.winPercentage.toFixed(1)}%`;
