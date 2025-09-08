@@ -604,11 +604,20 @@ input:focus, select:focus {
 }
 .stats-header #stats-konteks {
     margin: 0.5rem 0 0 0;
-    font-weight: 500;
+    line-height: 1.4;
+}
+
+#stats-konteks-klub, #stats-konteks-hari {
+    margin: 0;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 0.9rem;
 }
+#stats-konteks-klub {
+    margin-bottom: 0.25rem;
+}
+
 .stat-item .stat-label {
     font-size: 1rem; /* REVISED: smaller label */
     font-weight: 600;
@@ -639,7 +648,7 @@ input:focus, select:focus {
 .stats-bg-white, .stats-bg-white h1, .stats-bg-white .stat-value {
     color: var(--dark-color);
 }
-.stats-bg-white .stat-label, .stats-bg-white #stats-konteks {
+.stats-bg-white .stat-label, .stats-bg-white #stats-konteks p {
     color: #555;
 }
 /* Theme for Transparent BG */
@@ -718,6 +727,69 @@ input:focus, select:focus {
 }
 #modal-close-button {
     background-color: #6c757d;
+}
+
+/* =====================================================================
+   STANDINGS IMAGE CAPTURE STYLES
+   ===================================================================== */
+.standings-capture-wrapper {
+    background-color: var(--light-color);
+    padding: 2rem;
+    width: 720px;
+    box-sizing: border-box;
+    font-family: var(--font-family);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+.standings-capture-wrapper h2, .standings-capture-wrapper h3 {
+    text-align: center;
+    color: var(--dark-color);
+    text-transform: uppercase;
+    margin: 0;
+}
+.standings-capture-wrapper .capture-title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+.standings-capture-wrapper .capture-subtitle {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+    color: var(--text-muted);
+}
+.standings-capture-wrapper table {
+    width: 100%; 
+    border-collapse: collapse; 
+}
+.standings-capture-wrapper th, .standings-capture-wrapper td { 
+    padding: 12px 15px; 
+    border-bottom: 1px solid var(--border-color); 
+    text-align: left; 
+    white-space: nowrap;
+    font-size: 1rem;
+}
+.standings-capture-wrapper th { 
+    background-color: #f8f9fa; 
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-color);
+}
+.standings-capture-wrapper tr:last-child td { border-bottom: none; }
+.standings-capture-wrapper .nama-pemain-klasemen {
+    font-weight: 600;
+    color: var(--primary-color);
+    cursor: default;
+    text-decoration: none;
+}
+.standings-capture-wrapper .capture-footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: uppercase;
 }
 
 /* =====================================================================
